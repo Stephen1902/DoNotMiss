@@ -6,6 +6,36 @@
 #include "GameFramework/GameStateBase.h"
 #include "DNM_GameStateBase.generated.h"
 
+USTRUCT(BlueprintType)
+struct FLevelInfoStruct
+{
+	GENERATED_BODY()
+
+	// Current game level
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	int32 Level;
+
+	// Number of enemies to spawn in this level
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	int32 NumberOfEnemies;
+
+	// Maximum number of enemies to be spawned at any time
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	int32 MaxEnemiesAlive;
+
+	// Time in seconds between enemy attempts to spawn
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	float TimeBetweenSpawns;
+
+	FLevelInfoStruct()
+	{
+		Level = 1;
+		NumberOfEnemies = 10;
+		MaxEnemiesAlive = 4;
+		TimeBetweenSpawns = 1.0f;
+	}
+};
+
 /**
  * 
  */
@@ -13,5 +43,25 @@ UCLASS()
 class DONOTMISS_API ADNM_GameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
+
+protected:
+	ADNM_GameStateBase();
 	
+	// Called When Game Starts
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaSeconds) override;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	TArray<FLevelInfoStruct> LevelInfo;
+
+private:
+	int32 CurrentLevel;
+	int32 EnemiesLeftToSpawn;
+	int32 CurrentEnemiesAlive;
+	float TimeSinceLastSpawn;
+
+	void TryToSpawnNewEnemy(float DeltaSeconds);
+	void SpawnNewEnemy();
 };

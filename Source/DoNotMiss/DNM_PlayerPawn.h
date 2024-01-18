@@ -30,6 +30,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	class UCameraComponent* CameraComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	TArray<TSubclassOf<class ADNM_WeaponBase>> PlayerWeapons;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
