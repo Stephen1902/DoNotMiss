@@ -56,12 +56,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
 	TArray<FLevelInfoStruct> LevelInfo;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawn Points")
+	TArray<class AActor*> EnemySpawnTargetPoints;  
 private:
 	int32 CurrentLevel;
 	int32 EnemiesLeftToSpawn;
 	int32 CurrentEnemiesAlive;
+	int32 LastSpawnPointUsed;
 	float TimeSinceLastSpawn;
 
 	void TryToSpawnNewEnemy(float DeltaSeconds);
-	void SpawnNewEnemy();
+	void SpawnNewEnemy(const AActor* SpawnPointToUse);
+
 };
