@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	ADNM_ProjectileBase();
 
+	int32 GetDamagePerBullet() const { return DamagePerBullet; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

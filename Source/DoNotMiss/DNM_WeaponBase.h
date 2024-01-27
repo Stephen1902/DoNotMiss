@@ -52,6 +52,8 @@ public:
 	// Sets default values for this actor's properties
 	ADNM_WeaponBase();
 
+	int32 GetCurrentAmmo() const { return CurrentAmmo; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

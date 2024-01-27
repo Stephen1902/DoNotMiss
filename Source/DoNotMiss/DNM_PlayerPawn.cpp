@@ -2,8 +2,8 @@
 
 
 #include "DNM_PlayerPawn.h"
-
 #include "DNM_PlayerController.h"
+#include "DNM_WeaponBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -23,6 +23,15 @@ ADNM_PlayerPawn::ADNM_PlayerPawn()
 	SkeletalMeshComponent->SetupAttachment(CapsuleComponent);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
+}
+
+void ADNM_PlayerPawn::WeaponChosen(ADNM_WeaponBase* WeaponIn)
+{
+	if (WeaponIn != nullptr)
+	{
+		PlayerWeapon = WeaponIn;
+		PlayerBullets = WeaponIn->GetCurrentAmmo();
+	}
 }
 
 // Called when the game starts or when spawned

@@ -15,10 +15,17 @@ public:
 	// Sets default values for this character's properties
 	AEnemyCharacterBase();
 
+	// Called when a projectile hits this enemy
+	void DealWithProjectile(class ADNM_ProjectileBase* ProjectileThatHit);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// The amount of health this enemy starts the game with
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	float StartingHealth; 
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -26,4 +33,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	float CurrentHealth;
+	void EnemyHasDied();
+	
+	UPROPERTY()
+	TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
 };
+

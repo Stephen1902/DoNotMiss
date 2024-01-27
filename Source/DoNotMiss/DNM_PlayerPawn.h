@@ -15,6 +15,8 @@ public:
 	// Sets default values for this pawn's properties
 	ADNM_PlayerPawn();
 
+	void WeaponChosen(class ADNM_WeaponBase* WeaponIn);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,8 +33,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	class UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	TArray<TSubclassOf<class ADNM_WeaponBase>> PlayerWeapons;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
+	ADNM_WeaponBase* PlayerWeapon;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -45,5 +47,7 @@ private:
 	APlayerController* PlayerController;
 
 	void RotatePlayer(float DeltaTime);
+
+	int32 PlayerBullets;
 };
 

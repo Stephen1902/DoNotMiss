@@ -2,6 +2,9 @@
 
 
 #include "EnemyCharacterBase.h"
+#include "DNM_ProjectileBase.h"
+#include "DNM_PlayerPawn.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyCharacterBase::AEnemyCharacterBase()
@@ -11,11 +14,34 @@ AEnemyCharacterBase::AEnemyCharacterBase()
 
 }
 
+void AEnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThatHit)
+{
+	if (ProjectileThatHit != nullptr)
+	{
+		// Add the projectile that hit the enemy to the array
+		ProjectilesThatHit.Add(ProjectileThatHit);
+		
+		if (const int32 DamagedCaused = ProjectileThatHit->GetDamagePerBullet() > 0)
+		{
+			CurrentHealth -= DamagedCaused;
+
+			if (CurrentHealth <= 0)
+			{
+				EnemyHasDied();
+			}
+		}
+
+		// Destroy the projectile
+		ProjectileThatHit->Destroy();
+	}
+}
+
 // Called when the game starts or when spawned
 void AEnemyCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CurrentHealth = StartingHealth;
 }
 
 // Called every frame
@@ -32,3 +58,15 @@ void AEnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 }
 
+void AEnemyCharacterBase::EnemyHasDied()
+{
+	// Get the player character
+	if (ADNM_PlayerPawn* PlayerPawn = Cast<ADNM_PlayerPawn>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+	{
+		// Return the bullets from this enemy to the bullet pool
+		for (int32 i = 0; i < ProjectilesThatHit.Num(); ++i)
+		{
+			
+		}
+	}
+}
