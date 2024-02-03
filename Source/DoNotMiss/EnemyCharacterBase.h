@@ -25,7 +25,10 @@ protected:
 	// The amount of health this enemy starts the game with
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	float StartingHealth; 
-	
+
+	//  After spawning, how long before the enemy moves towards the player
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	float DelayBeforeMoving;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -38,5 +41,6 @@ public:
 	
 	UPROPERTY()
 	TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
+	
 };
 

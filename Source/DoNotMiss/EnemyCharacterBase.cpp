@@ -2,6 +2,7 @@
 
 
 #include "EnemyCharacterBase.h"
+#include "DNM_AIController.h"
 #include "DNM_ProjectileBase.h"
 #include "DNM_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,7 +12,17 @@ AEnemyCharacterBase::AEnemyCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	StartingHealth = 100.f;
+	CurrentHealth = StartingHealth;
+	DelayBeforeMoving = 0.2f;
 
+	static ConstructorHelpers::FClassFinder<ADNM_AIController> FoundAIController(TEXT("/Game/Blueprints/Enemies/BP_AIController"));
+	if (FoundAIController.Succeeded())
+	{
+		AutoPossessAI = EAutoPossessAI::Disabled;
+		AIControllerClass = FoundAIController.Class;
+	}
 }
 
 void AEnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThatHit)
@@ -42,6 +53,14 @@ void AEnemyCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = StartingHealth;
+
+	if (AIControllerClass)
+	{
+		const FActorSpawnParameters SpawnParameters;
+		ADNM_AIController* PawnController = GetWorld()->SpawnActor<ADNM_AIController>(AIControllerClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
+		PawnController->Possess(this);
+	}
+	
 }
 
 // Called every frame

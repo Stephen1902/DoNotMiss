@@ -57,7 +57,10 @@ protected:
 	TArray<FLevelInfoStruct> LevelInfo;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawn Points")
-	TArray<class AActor*> EnemySpawnTargetPoints;  
+	TArray<class AActor*> EnemySpawnTargetPoints;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemies")
+	TArray<TSubclassOf<class AEnemyCharacterBase>> EnemiesToSpawn;
 private:
 	int32 CurrentLevel;
 	int32 EnemiesLeftToSpawn;

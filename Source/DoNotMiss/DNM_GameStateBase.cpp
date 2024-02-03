@@ -3,6 +3,7 @@
 
 #include "DNM_GameStateBase.h"
 
+#include "EnemyCharacterBase.h"
 #include "EnemySpawnTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -13,6 +14,9 @@ ADNM_GameStateBase::ADNM_GameStateBase()
 
 	CurrentLevel = 0;
 	LastSpawnPointUsed = -1;
+	CurrentEnemiesAlive = 0;
+	EnemiesLeftToSpawn = 0;
+	TimeSinceLastSpawn = 0.0f;
 }
 
 void ADNM_GameStateBase::BeginPlay()
@@ -48,8 +52,8 @@ void ADNM_GameStateBase::Tick(float DeltaSeconds)
 
 void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
 {
-	// Make sure there is information in the array
-	if (LevelInfo.Num() > 0)
+	// Make sure there is information in the LevelInfo and EnemiesToSpawn arrays
+	if (LevelInfo.Num() > 0 && EnemiesToSpawn.Num() > 0)
 	{
 		TimeSinceLastSpawn += DeltaSeconds;
 
@@ -63,7 +67,6 @@ void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
 				// Check the random number hasn't chosen the same as previous, to avoid enemies spawning on the same path too close together
 				if (RandomSpawnPoint != LastSpawnPointUsed)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Spawning using Random Point %s"), *EnemySpawnTargetPoints[RandomSpawnPoint]->GetName())
 					LastSpawnPointUsed = RandomSpawnPoint;
 					TimeSinceLastSpawn = 0.f;
 					SpawnNewEnemy(EnemySpawnTargetPoints[RandomSpawnPoint]);
@@ -77,7 +80,10 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 {
 	if (SpawnPointToUse != nullptr)
 	{
-		
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
+		AEnemyCharacterBase* NewEnemy = GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
 	}
 }
 
