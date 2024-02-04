@@ -2,7 +2,6 @@
 
 
 #include "DNM_WeaponBase.h"
-
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
@@ -23,6 +22,7 @@ ADNM_WeaponBase::ADNM_WeaponBase()
 	CurrentAmmo = StartingAmmo;
 	bBurstFire = false;
 	NumberPerBurst = 0;
+	TimeBetweenFiring = 0.5f;
 }
 
 // Called when the game starts or when spawned
@@ -37,5 +37,16 @@ void ADNM_WeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool ADNM_WeaponBase::TryToFire()
+{
+	Fire();
+	return true;
+}
+
+void ADNM_WeaponBase::Fire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
 }
 

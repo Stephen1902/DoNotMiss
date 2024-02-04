@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "DNM_PlayerPawn.generated.h"
 
+class ADNM_WeaponBase;
+
 UCLASS()
 class DONOTMISS_API ADNM_PlayerPawn : public APawn
 {
@@ -14,8 +16,6 @@ class DONOTMISS_API ADNM_PlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ADNM_PlayerPawn();
-
-	void WeaponChosen(class ADNM_WeaponBase* WeaponIn);
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +33,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	class UCameraComponent* CameraComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	TSubclassOf<ADNM_WeaponBase> PistolBP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	TSubclassOf<ADNM_WeaponBase> ShotgunBP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	TSubclassOf<ADNM_WeaponBase> RifleBP;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
 	ADNM_WeaponBase* PlayerWeapon;
 public:	
@@ -49,5 +58,12 @@ private:
 	void RotatePlayer(float DeltaTime);
 
 	int32 PlayerBullets;
+
+	void SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse);
+	void TryToFire();
+	float TimeBetweenFiring;
+	float TimeSinceLastFired;
+
+	bool bGameIsPaused;
 };
 

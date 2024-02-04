@@ -54,6 +54,13 @@ public:
 
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
 
+	float GetTimeBetweenFiring() const { return TimeBetweenFiring; }
+
+	bool TryToFire();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	EWeaponType WeaponType;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -65,11 +72,12 @@ protected:
 	USkeletalMeshComponent* MeshComp;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	EWeaponType WeaponType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	int32 StartingAmmo;
 
+	// Time in seconds before the player can fire, to avoid mouse click spamming
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	float TimeBetweenFiring;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	FReloadStruct ReloadStruct;
 
@@ -88,4 +96,5 @@ public:
 
 private:
 	int32 CurrentAmmo;
+	void Fire();
 };
