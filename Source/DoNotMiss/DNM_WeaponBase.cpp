@@ -2,7 +2,10 @@
 
 
 #include "DNM_WeaponBase.h"
+
+#include "DNM_ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADNM_WeaponBase::ADNM_WeaponBase()
@@ -41,12 +44,28 @@ void ADNM_WeaponBase::Tick(float DeltaTime)
 
 bool ADNM_WeaponBase::TryToFire()
 {
-	Fire();
-	return true;
+	if (BulletToSpawn != nullptr  && CurrentAmmo > 0)
+	{
+		Fire();
+		return true;
+	}
+	 return false;
 }
 
 void ADNM_WeaponBase::Fire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+	const FActorSpawnParameters SpawnParameters;
+	const FTransform SocketTransform = MeshComp->GetSocketTransform(FName("FiringSocket"));
+	ADNM_ProjectileBase* SpawnedBullet = GetWorld()->SpawnActor<ADNM_ProjectileBase>(BulletToSpawn, SocketTransform, SpawnParameters);
+
+	//UGameplayStatics::SetGamePaused(GetWorld(), true);
+	
+	const FString StringToDisplay = "X: " + FString::SanitizeFloat(SocketTransform.GetLocation().X) + " Y: " + FString::SanitizeFloat(SocketTransform.GetLocation().Y) + " Z: " + FString::SanitizeFloat(SocketTransform.GetLocation().Z);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, StringToDisplay);
+
+	// const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
+	// SpawnedBullet->AttachToComponent(MeshComp, TransformRules, FName("FiringSocket"));
+
 }
 

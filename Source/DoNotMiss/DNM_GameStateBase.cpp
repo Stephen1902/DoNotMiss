@@ -25,7 +25,7 @@ void ADNM_GameStateBase::BeginPlay()
 
 	if (LevelInfo.Num() > 0)
 	{
-		EnemiesLeftToSpawn = LevelInfo[CurrentLevel].NumberOfEnemies;;
+		EnemiesLeftToSpawn = LevelInfo[CurrentLevel].NumberOfEnemies;
 		TimeSinceLastSpawn = LevelInfo[CurrentLevel].TimeBetweenSpawns;
 	}
 	else
@@ -84,6 +84,7 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
 		AEnemyCharacterBase* NewEnemy = GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
+		CurrentEnemiesAlive += 1;
 	}
 }
 

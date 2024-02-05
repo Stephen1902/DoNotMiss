@@ -22,6 +22,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	USceneComponent* SceneComp;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	UStaticMeshComponent* MeshComp;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
@@ -31,11 +34,13 @@ protected:
 	int32 DamagePerBullet;
 
 	UFUNCTION()
-	void ComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
+private:
+	FTimerHandle DestroyTimer;
+	void DestroyAfterDelay();
 };
 

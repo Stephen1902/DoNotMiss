@@ -7,11 +7,16 @@
 #include "DNM_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
+#define ProjectileTrace ECC_GameTraceChannel1 
+
 // Sets default values
 AEnemyCharacterBase::AEnemyCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Use custom trace channel for projectiles so the only thing that causes projectile to overlap is this
+	GetMesh()->SetCollisionResponseToChannel(ProjectileTrace, ECR_Block);
 	
 	StartingHealth = 100.f;
 	CurrentHealth = StartingHealth;
@@ -31,19 +36,18 @@ void AEnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThat
 	{
 		// Add the projectile that hit the enemy to the array
 		ProjectilesThatHit.Add(ProjectileThatHit);
-		
-		if (const int32 DamagedCaused = ProjectileThatHit->GetDamagePerBullet() > 0)
+
+		const int32 DamagedCaused = ProjectileThatHit->GetDamagePerBullet();
+		if (DamagedCaused > 0)
 		{
 			CurrentHealth -= DamagedCaused;
 
+			UE_LOG(LogTemp, Warning, TEXT("Current Health of %s is %f"), *GetName(), CurrentHealth);
 			if (CurrentHealth <= 0)
 			{
 				EnemyHasDied();
 			}
 		}
-
-		// Destroy the projectile
-		ProjectileThatHit->Destroy();
 	}
 }
 

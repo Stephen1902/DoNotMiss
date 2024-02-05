@@ -1,9 +1,6 @@
 // Copyright 2024 DME Games
 
-
 #include "DNM_AIController.h"
-
-#include "EnemyCharacterBase.h"
 #include "Kismet/GameplayStatics.h"
 
 ADNM_AIController::ADNM_AIController()
@@ -27,6 +24,6 @@ void ADNM_AIController::StartToMove()
 	if (!TargetLocation.IsNearlyZero())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Moving to: %s"), *TargetLocation.ToString());
-		MoveToLocation(TargetLocation, 100.f);
+		MoveToLocation(TargetLocation, 200.f);
 	}
 }
