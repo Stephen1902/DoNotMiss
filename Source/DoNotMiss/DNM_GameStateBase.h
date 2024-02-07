@@ -70,5 +70,8 @@ private:
 
 	void TryToSpawnNewEnemy(float DeltaSeconds);
 	void SpawnNewEnemy(const AActor* SpawnPointToUse);
+	UFUNCTION()
+	void GameHasStarted();
+	bool bGameHasStarted = false;
 
 };

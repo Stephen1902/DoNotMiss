@@ -3,3 +3,7 @@
 
 #include "DNM_PlayerController.h"
 
+void ADNM_PlayerController::GameHasStarted()
+{
+	OnGameStarted.Broadcast();
+}

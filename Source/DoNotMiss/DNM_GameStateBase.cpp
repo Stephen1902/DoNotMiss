@@ -3,6 +3,7 @@
 
 #include "DNM_GameStateBase.h"
 
+#include "DNM_PlayerController.h"
 #include "EnemyCharacterBase.h"
 #include "EnemySpawnTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -40,13 +41,21 @@ void ADNM_GameStateBase::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GameStateBase failed to find any EnemySpawnTargetPoints"));
 	}
+
+	if (ADNM_PlayerController* PlayerController = Cast<ADNM_PlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PlayerController->OnGameStarted.AddDynamic(this, &ADNM_GameStateBase::GameHasStarted);
+	}
 }
 
 void ADNM_GameStateBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	TryToSpawnNewEnemy(DeltaSeconds);
+	if (bGameHasStarted)
+	{
+		TryToSpawnNewEnemy(DeltaSeconds);
+	}
 
 }
 
@@ -86,6 +95,11 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		AEnemyCharacterBase* NewEnemy = GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
 		CurrentEnemiesAlive += 1;
 	}
+}
+
+void ADNM_GameStateBase::GameHasStarted()
+{
+	bGameHasStarted = true;
 }
 
 
