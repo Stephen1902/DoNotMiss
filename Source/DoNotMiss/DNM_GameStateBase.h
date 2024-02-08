@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "DNM_GameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClockUpdated, float, NewClockTime);
+
 USTRUCT(BlueprintType)
 struct FLevelInfoStruct
 {
@@ -44,6 +46,11 @@ class DONOTMISS_API ADNM_GameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 
+public:
+	void SetGameIsRunning(const bool GameRunningIn);
+
+	UPROPERTY()
+	FOnClockUpdated OnClockUpdated;
 protected:
 	ADNM_GameStateBase();
 	
@@ -61,6 +68,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemies")
 	TArray<TSubclassOf<class AEnemyCharacterBase>> EnemiesToSpawn;
+
 private:
 	int32 CurrentLevel;
 	int32 EnemiesLeftToSpawn;
@@ -70,8 +78,10 @@ private:
 
 	void TryToSpawnNewEnemy(float DeltaSeconds);
 	void SpawnNewEnemy(const AActor* SpawnPointToUse);
-	UFUNCTION()
-	void GameHasStarted();
-	bool bGameHasStarted = false;
-
+	
+	bool bGameIsRunning = false;
+	
+	float TimePlayerAlive = 0.0f;
+	void UpdateClock();
+	FTimerHandle UpdateClockTimer;
 };

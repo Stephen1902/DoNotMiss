@@ -2,11 +2,10 @@
 
 
 #include "DNM_GameStateBase.h"
-
-#include "DNM_PlayerController.h"
 #include "EnemyCharacterBase.h"
 #include "EnemySpawnTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
+
 
 ADNM_GameStateBase::ADNM_GameStateBase()
 {
@@ -42,21 +41,18 @@ void ADNM_GameStateBase::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("GameStateBase failed to find any EnemySpawnTargetPoints"));
 	}
 
-	if (ADNM_PlayerController* PlayerController = Cast<ADNM_PlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		PlayerController->OnGameStarted.AddDynamic(this, &ADNM_GameStateBase::GameHasStarted);
-	}
+	GetWorld()->GetTimerManager().SetTimer(UpdateClockTimer, this, &ADNM_GameStateBase::UpdateClock, 0.1f, true, 0.1f);
 }
 
 void ADNM_GameStateBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bGameHasStarted)
+	if (bGameIsRunning)
 	{
+		TimePlayerAlive += DeltaSeconds;
 		TryToSpawnNewEnemy(DeltaSeconds);
 	}
-
 }
 
 void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
@@ -92,14 +88,28 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
-		AEnemyCharacterBase* NewEnemy = GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
+		GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
 		CurrentEnemiesAlive += 1;
 	}
 }
 
-void ADNM_GameStateBase::GameHasStarted()
+void ADNM_GameStateBase::UpdateClock()
 {
-	bGameHasStarted = true;
+	OnClockUpdated.Broadcast(TimePlayerAlive);
 }
 
-
+void ADNM_GameStateBase::SetGameIsRunning(const bool GameRunningIn)
+{
+	bGameIsRunning = GameRunningIn;
+	if (!bGameIsRunning)
+	{
+		if (GetWorld()->GetTimerManager().IsTimerActive(UpdateClockTimer))
+		{
+			GetWorld()->GetTimerManager().PauseTimer(UpdateClockTimer);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().UnPauseTimer(UpdateClockTimer);
+		}
+	}
+}

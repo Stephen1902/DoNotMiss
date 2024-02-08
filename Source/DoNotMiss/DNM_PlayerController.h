@@ -6,8 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "DNM_PlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameStarted);
-
 /**
  * 
  */
@@ -16,11 +14,30 @@ class DONOTMISS_API ADNM_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION()
+	void UpdateWidgetClock(const float NewTime);
+	
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Set Up")
+	TSubclassOf<class UDNM_PlayerWidget> PlayerWidget;
+	
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void GameHasStarted();
 
-public:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+private:
 	UPROPERTY()
-	FOnGameStarted OnGameStarted;
+	class ADNM_GameStateBase* GameStateRef;
+
+	void SetGameStateRef();
+
+	UPROPERTY()
+	UDNM_PlayerWidget* PlayerWidgetRef;
+
+	void AddPlayerWidget();
+	
+	bool bGameIsRunning = false;
 };
