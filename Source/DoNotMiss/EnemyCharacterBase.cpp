@@ -3,6 +3,7 @@
 
 #include "EnemyCharacterBase.h"
 #include "DNM_AIController.h"
+#include "DNM_PlayerController.h"
 #include "DNM_ProjectileBase.h"
 #include "DNM_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
@@ -84,12 +85,16 @@ void AEnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void AEnemyCharacterBase::EnemyHasDied()
 {
 	// Get the player character
-	if (ADNM_PlayerPawn* PlayerPawn = Cast<ADNM_PlayerPawn>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
+	if (ADNM_PlayerController* PlayerController = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
 	{
-		// Return the bullets from this enemy to the bullet pool
+		PlayerController->ReturnPlayerBullet(ProjectilesThatHit.Num());
+		// TODO Change this so it returns the actual type of bullet, not just a number of bullets for gun switching later
 		for (int32 i = 0; i < ProjectilesThatHit.Num(); ++i)
 		{
 			
 		}
 	}
+
+	GetMesh()->SetSimulatePhysics(true);
+	SetLifeSpan(2.0f);
 }

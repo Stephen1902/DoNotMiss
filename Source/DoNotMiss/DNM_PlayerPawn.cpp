@@ -1,6 +1,8 @@
 // Copyright 2024 DME Games
 
 #include "DNM_PlayerPawn.h"
+
+#include "DNM_PlayerController.h"
 #include "DNM_WeaponBase.h"
 #include "DoNotMissGameModeBase.h"
 #include "Camera/CameraComponent.h"
@@ -22,9 +24,10 @@ ADNM_PlayerPawn::ADNM_PlayerPawn()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
 
-	TimeBetweenFiring = 0.0f;
-	TimeSinceLastFired = 0.0f;
-	bGameIsPaused = false;
+	//bGameIsRunning = false;
+
+	// TODO Fix so game running is controlled by the player controller
+	bGameIsRunning = true;
 }
 
 // Called when the game starts or when spawned
@@ -32,39 +35,17 @@ void ADNM_PlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	PlayerController->SetShowMouseCursor(true);
-
-	const FString PassedInOption = UGameplayStatics::GetGameMode(GetWorld())->OptionsString;;
-
-	if (PassedInOption.Contains("pistol") && PistolBP != nullptr)
-	{
-		SpawnPlayerWeapon(PistolBP, FName("PistolSocket"));
-	}
-	else if (PassedInOption.Contains("shotgun") && ShotgunBP != nullptr)
-	{
-		SpawnPlayerWeapon(ShotgunBP, FName("WeaponSocket"));
-	}
-	else if (PassedInOption.Contains("rifle") && RifleBP != nullptr)
-	{
-		SpawnPlayerWeapon(RifleBP, FName("WeaponSocket"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("The option the player selected (%s) doesn't contain a valid Blueprint"), *PassedInOption);
-	}
+	PlayerController = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }
 
 // Called every frame
 void ADNM_PlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	RotatePlayer(DeltaTime);
-
-	if (!bGameIsPaused)
+	
+//	if (bGameIsRunning)
 	{
-		TimeSinceLastFired += DeltaTime;
+		RotatePlayer(DeltaTime);
 	}
 }
 
@@ -72,8 +53,7 @@ void ADNM_PlayerPawn::Tick(float DeltaTime)
 void ADNM_PlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("TryToFire", IE_Pressed, this, &ADNM_PlayerPawn::TryToFire);
+	
 }
 
 void ADNM_PlayerPawn::RotatePlayer(float DeltaTime)
@@ -90,25 +70,5 @@ void ADNM_PlayerPawn::RotatePlayer(float DeltaTime)
 	}
 }
 
-void ADNM_PlayerPawn::SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse)
-{
-	const FActorSpawnParameters SpawnParameters;
-	PlayerWeapon = GetWorld()->SpawnActor<ADNM_WeaponBase>(WeaponToUse, GetActorLocation(), GetActorRotation(), SpawnParameters);
-	const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 
-	PlayerWeapon->AttachToComponent(SkeletalMeshComponent, TransformRules, SocketToUse);
-	PlayerBullets = WeaponToUse.GetDefaultObject()->GetCurrentAmmo();
-	TimeBetweenFiring = WeaponToUse.GetDefaultObject()->GetTimeBetweenFiring();
-	TimeSinceLastFired = TimeBetweenFiring;
-}
 
-void ADNM_PlayerPawn::TryToFire()
-{
-	if (!bGameIsPaused && TimeSinceLastFired > TimeBetweenFiring)
-	{
-		if (PlayerWeapon->TryToFire())
-		{
-			TimeSinceLastFired = 0.f;
-		}
-	}
-}

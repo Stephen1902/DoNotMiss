@@ -24,8 +24,18 @@ ADNM_WeaponBase::ADNM_WeaponBase()
 	StartingAmmo = 100;
 	CurrentAmmo = StartingAmmo;
 	bBurstFire = false;
-	NumberPerBurst = 0;
+	NumberPerBurst = 1;
 	TimeBetweenFiring = 0.5f;
+}
+
+int32 ADNM_WeaponBase::GetBulletsPerFire() const
+{
+	if (bBurstFire)
+	{
+		return NumberPerBurst;
+	}
+
+	return 1;
 }
 
 // Called when the game starts or when spawned

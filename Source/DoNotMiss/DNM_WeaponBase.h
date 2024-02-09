@@ -53,7 +53,7 @@ public:
 	ADNM_WeaponBase();
 
 	int32 GetCurrentAmmo() const { return CurrentAmmo; }
-
+	int32 GetBulletsPerFire() const;
 	float GetTimeBetweenFiring() const { return TimeBetweenFiring; }
 
 	bool TryToFire();

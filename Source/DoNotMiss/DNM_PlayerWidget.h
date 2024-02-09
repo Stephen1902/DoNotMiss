@@ -13,8 +13,12 @@ UCLASS()
 class DONOTMISS_API UDNM_PlayerWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateTimeSurvived(const FText& NewTime);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateBulletCount(const FText& NewBulletCount);
 };

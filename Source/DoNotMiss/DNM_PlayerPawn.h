@@ -17,6 +17,9 @@ public:
 	// Sets default values for this pawn's properties
 	ADNM_PlayerPawn();
 
+	USkeletalMeshComponent* GetSkeletalMeshComp() const { return SkeletalMeshComponent; }
+
+	void SetGameIsRunning(const bool GameIsRunningIn) { bGameIsRunning = GameIsRunningIn; }
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,17 +36,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	class UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	TSubclassOf<ADNM_WeaponBase> PistolBP;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	TSubclassOf<ADNM_WeaponBase> ShotgunBP;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	TSubclassOf<ADNM_WeaponBase> RifleBP;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Gameplay")
-	ADNM_WeaponBase* PlayerWeapon;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,14 +48,7 @@ private:
 	APlayerController* PlayerController;
 
 	void RotatePlayer(float DeltaTime);
-
-	int32 PlayerBullets;
-
-	void SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse);
-	void TryToFire();
-	float TimeBetweenFiring;
-	float TimeSinceLastFired;
-
-	bool bGameIsPaused;
+	
+	bool bGameIsRunning;
 };
 
