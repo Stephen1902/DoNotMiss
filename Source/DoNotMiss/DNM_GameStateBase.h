@@ -67,7 +67,7 @@ protected:
 	TArray<class AActor*> EnemySpawnTargetPoints;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemies")
-	TArray<TSubclassOf<class AEnemyCharacterBase>> EnemiesToSpawn;
+	TArray<TSubclassOf<class ADNM_EnemyCharacterBase>> EnemiesToSpawn;
 
 private:
 	int32 CurrentLevel;

@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "EnemyCharacterBase.generated.h"
+#include "DNM_EnemyCharacterBase.generated.h"
 
 UCLASS()
-class DONOTMISS_API AEnemyCharacterBase : public ACharacter
+class DONOTMISS_API ADNM_EnemyCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AEnemyCharacterBase();
+	ADNM_EnemyCharacterBase();
 
 	// Called when a projectile hits this enemy
 	void DealWithProjectile(class ADNM_ProjectileBase* ProjectileThatHit);

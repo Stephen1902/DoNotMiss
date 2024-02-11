@@ -5,6 +5,7 @@
 #include "DNM_GameStateBase.h"
 #include "DNM_PlayerPawn.h"
 #include "DNM_PlayerWidget.h"
+#include "DNM_PauseWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 ADNM_PlayerController::ADNM_PlayerController()
@@ -16,6 +17,7 @@ ADNM_PlayerController::ADNM_PlayerController()
 	TimeSinceLastFired = 0.0f;
 	PlayerBullets = 0;
 	bGameIsRunning = false;
+	bGameIsPaused = false;
 }
 
 void ADNM_PlayerController::GameHasStarted()
@@ -72,6 +74,7 @@ void ADNM_PlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("TryToFire", IE_Pressed, this, &ADNM_PlayerController::TryToFire);
+	InputComponent->BindAction("TogglePause", IE_Pressed, this, &ADNM_PlayerController::TogglePauseWidget);
 }
 
 void ADNM_PlayerController::SetGameStateRef()
@@ -80,7 +83,7 @@ void ADNM_PlayerController::SetGameStateRef()
 
 	if (GameStateRef)
 	{
-		GameStateRef->OnClockUpdated.AddDynamic(this, &ADNM_PlayerController::UpdateWidgetClock);		
+		GameStateRef->OnClockUpdated.AddDynamic(this, &ADNM_PlayerController::UpdateWidgetClock);
 	}
 	else
 	{
@@ -101,15 +104,50 @@ void ADNM_PlayerController::AddPlayerWidget()
 	}
 }
 
+void ADNM_PlayerController::TogglePauseWidget()
+{
+	bGameIsPaused = !bGameIsPaused;
+	
+	if (!bGameIsPaused)
+	{
+		// Check if the widget exists and if not, create it
+		if (PauseWidget && PauseWidgetRef != nullptr)
+		{
+			PauseWidgetRef = CreateWidget<UDNM_PauseWidget>(this, PauseWidget);
+		}
+
+		// Remove the player widget and add the pause widget
+		bGameIsRunning = false;
+		if (GameStateRef)
+		{
+			GameStateRef->SetGameIsRunning(false);
+		}
+		PlayerWidgetRef->RemoveFromParent();
+		PauseWidgetRef->AddToViewport();
+	}
+	else
+	{
+		// Remove the pause widget and return the player widget
+		PauseWidgetRef->RemoveFromParent();
+		PlayerWidgetRef->AddToViewport();
+
+		if (GameStateRef)
+		{
+			GameStateRef->SetGameIsRunning(true);
+		}
+	}
+}
+
 void ADNM_PlayerController::SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse)
 {
-	ADNM_PlayerPawn* ControlledPawn = Cast<ADNM_PlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	const ADNM_PlayerPawn* ControlledPawn = Cast<ADNM_PlayerPawn>( UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (!ControlledPawn)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to get a controlled pawn in Player Controller"));
 		return;
 	}
+	
 	const FActorSpawnParameters SpawnParameters;
 	PlayerWeapon = GetWorld()->SpawnActor<ADNM_WeaponBase>(WeaponToUse, ControlledPawn->GetActorLocation(), ControlledPawn->GetActorRotation(), SpawnParameters);
 	const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
@@ -118,7 +156,6 @@ void ADNM_PlayerController::SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> Weapo
 	PlayerBullets = WeaponToUse.GetDefaultObject()->GetCurrentAmmo();
 	TimeBetweenFiring = WeaponToUse.GetDefaultObject()->GetTimeBetweenFiring();
 	TimeSinceLastFired = TimeBetweenFiring;
-
 }
 
 void ADNM_PlayerController::UpdateWidgetClock(const float NewTime)

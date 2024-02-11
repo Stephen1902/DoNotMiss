@@ -1,17 +1,16 @@
 // Copyright 2024 DME Games
 
 
-#include "EnemyCharacterBase.h"
+#include "DNM_EnemyCharacterBase.h"
 #include "DNM_AIController.h"
 #include "DNM_PlayerController.h"
 #include "DNM_ProjectileBase.h"
-#include "DNM_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
 #define ProjectileTrace ECC_GameTraceChannel1 
 
 // Sets default values
-AEnemyCharacterBase::AEnemyCharacterBase()
+ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -31,7 +30,7 @@ AEnemyCharacterBase::AEnemyCharacterBase()
 	}
 }
 
-void AEnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThatHit)
+void ADNM_EnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThatHit)
 {
 	if (ProjectileThatHit != nullptr)
 	{
@@ -53,7 +52,7 @@ void AEnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThat
 }
 
 // Called when the game starts or when spawned
-void AEnemyCharacterBase::BeginPlay()
+void ADNM_EnemyCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -69,20 +68,20 @@ void AEnemyCharacterBase::BeginPlay()
 }
 
 // Called every frame
-void AEnemyCharacterBase::Tick(float DeltaTime)
+void ADNM_EnemyCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void AEnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ADNM_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
-void AEnemyCharacterBase::EnemyHasDied()
+void ADNM_EnemyCharacterBase::EnemyHasDied()
 {
 	// Get the player character
 	if (ADNM_PlayerController* PlayerController = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))

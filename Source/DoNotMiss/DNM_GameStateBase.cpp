@@ -2,7 +2,7 @@
 
 
 #include "DNM_GameStateBase.h"
-#include "EnemyCharacterBase.h"
+#include "DNM_EnemyCharacterBase.h"
 #include "EnemySpawnTargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -88,7 +88,7 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
-		GetWorld()->SpawnActor<AEnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
+		GetWorld()->SpawnActor<ADNM_EnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
 		CurrentEnemiesAlive += 1;
 	}
 }

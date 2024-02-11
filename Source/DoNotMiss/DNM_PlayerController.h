@@ -20,6 +20,9 @@ public:
 	void UpdateWidgetClock(const float NewTime);
 
 	void ReturnPlayerBullet(int32 BulletNumber);
+
+	UFUNCTION(BlueprintCallable, Category = "Pause Menu")
+	void TogglePauseWidget();
 	
 protected:
 	ADNM_PlayerController();
@@ -27,6 +30,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Set Up")
 	TSubclassOf<class UDNM_PlayerWidget> PlayerWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Set Up")
+	TSubclassOf<class UDNM_PauseWidget> PauseWidget;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	TSubclassOf<ADNM_WeaponBase> PistolBP;
 
@@ -58,10 +64,12 @@ private:
 
 	UPROPERTY()
 	UDNM_PlayerWidget* PlayerWidgetRef;
-
 	void AddPlayerWidget();
-	
+
+	UPROPERTY()
+	UDNM_PauseWidget* PauseWidgetRef;
 	bool bGameIsRunning;
+	bool bGameIsPaused;
 
 	int32 PlayerBullets;
 	void SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse);
