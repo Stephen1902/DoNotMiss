@@ -21,4 +21,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateBulletCount(const FText& NewBulletCount);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateEnemyKilledCount(const FText& NewEnemyKilledCount);
 };

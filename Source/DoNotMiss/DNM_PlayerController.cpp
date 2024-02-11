@@ -16,17 +16,17 @@ ADNM_PlayerController::ADNM_PlayerController()
 	TimeBetweenFiring = 0.0f;
 	TimeSinceLastFired = 0.0f;
 	PlayerBullets = 0;
+	EnemiesKilled = 0;
 	bGameIsRunning = false;
-	bGameIsPaused = false;
 }
 
 void ADNM_PlayerController::GameHasStarted()
 {
 	bGameIsRunning = true;
-	//OnGameStarted.Broadcast();
 
-	if (GameStateRef)
+	if (GameStateRef && ControlledPawn)
 	{
+		ControlledPawn->SetGameIsRunning(true);
 		GameStateRef->SetGameIsRunning(true);
 	}
 }
@@ -36,27 +36,9 @@ void ADNM_PlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	SetShowMouseCursor(true);
-
-	const FString PassedInOption = UGameplayStatics::GetGameMode(GetWorld())->OptionsString;;
-
-	if (PassedInOption.Contains("pistol") && PistolBP != nullptr)
-	{
-		SpawnPlayerWeapon(PistolBP, FName("PistolSocket"));
-	}
-	else if (PassedInOption.Contains("shotgun") && ShotgunBP != nullptr)
-	{
-		SpawnPlayerWeapon(ShotgunBP, FName("WeaponSocket"));
-	}
-	else if (PassedInOption.Contains("rifle") && RifleBP != nullptr)
-	{
-		SpawnPlayerWeapon(RifleBP, FName("WeaponSocket"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("The option the player selected (%s) doesn't contain a valid Blueprint"), *PassedInOption);
-	}
+	SetPlayerWeapon();	
 	SetGameStateRef();
-	AddPlayerWidget();
+	CreatePlayerWidgets();
 }
 
 void ADNM_PlayerController::Tick(float DeltaSeconds)
@@ -77,6 +59,28 @@ void ADNM_PlayerController::SetupInputComponent()
 	InputComponent->BindAction("TogglePause", IE_Pressed, this, &ADNM_PlayerController::TogglePauseWidget);
 }
 
+void ADNM_PlayerController::SetPlayerWeapon()
+{
+	const FString PassedInOption = UGameplayStatics::GetGameMode(GetWorld())->OptionsString;;
+
+	if (PassedInOption.Contains("pistol") && PistolBP != nullptr)
+	{
+		SpawnPlayerWeapon(PistolBP, FName("PistolSocket"));
+	}
+	else if (PassedInOption.Contains("shotgun") && ShotgunBP != nullptr)
+	{
+		SpawnPlayerWeapon(ShotgunBP, FName("WeaponSocket"));
+	}
+	else if (PassedInOption.Contains("rifle") && RifleBP != nullptr)
+	{
+		SpawnPlayerWeapon(RifleBP, FName("WeaponSocket"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("The option the player selected (%s) doesn't contain a valid Blueprint"), *PassedInOption);
+	}
+}
+
 void ADNM_PlayerController::SetGameStateRef()
 {
 	GameStateRef = Cast<ADNM_GameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
@@ -91,7 +95,7 @@ void ADNM_PlayerController::SetGameStateRef()
 	}
 }
 
-void ADNM_PlayerController::AddPlayerWidget()
+void ADNM_PlayerController::CreatePlayerWidgets()
 {
 	if (PlayerWidget)
 	{
@@ -102,45 +106,50 @@ void ADNM_PlayerController::AddPlayerWidget()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player Controller does not have a valid player widget set"));
 	}
+
+	if (PauseWidget)
+	{
+		PauseWidgetRef = CreateWidget<UDNM_PauseWidget>(this, PauseWidget);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player Controller does not have a valid pause widget set"));
+	}
+
 }
 
 void ADNM_PlayerController::TogglePauseWidget()
 {
-	bGameIsPaused = !bGameIsPaused;
-	
-	if (!bGameIsPaused)
-	{
-		// Check if the widget exists and if not, create it
-		if (PauseWidget && PauseWidgetRef != nullptr)
-		{
-			PauseWidgetRef = CreateWidget<UDNM_PauseWidget>(this, PauseWidget);
-		}
+	bGameIsRunning = !bGameIsRunning;
 
-		// Remove the player widget and add the pause widget
-		bGameIsRunning = false;
-		if (GameStateRef)
-		{
-			GameStateRef->SetGameIsRunning(false);
-		}
-		PlayerWidgetRef->RemoveFromParent();
-		PauseWidgetRef->AddToViewport();
+	// Tell the game state and Player Pawn the game status has changed
+	if (GameStateRef && ControlledPawn)
+	{
+		ControlledPawn->SetGameIsRunning(bGameIsRunning);
+		GameStateRef->SetGameIsRunning(bGameIsRunning);
 	}
-	else
+	
+	// Check we have a Player Widget and Pause Widget set
+	if (PlayerWidgetRef && PauseWidgetRef)
 	{
-		// Remove the pause widget and return the player widget
-		PauseWidgetRef->RemoveFromParent();
-		PlayerWidgetRef->AddToViewport();
-
-		if (GameStateRef)
+		if (!bGameIsRunning)
 		{
-			GameStateRef->SetGameIsRunning(true);
+			// Remove the player widget and add the pause widget
+			PlayerWidgetRef->RemoveFromParent();
+			PauseWidgetRef->AddToViewport();
+		}
+		else
+		{
+			// Remove the pause widget and return the player widget
+			PauseWidgetRef->RemoveFromParent();
+			PlayerWidgetRef->AddToViewport();
 		}
 	}
 }
 
 void ADNM_PlayerController::SpawnPlayerWeapon(TSubclassOf<ADNM_WeaponBase> WeaponToUse, FName SocketToUse)
 {
-	const ADNM_PlayerPawn* ControlledPawn = Cast<ADNM_PlayerPawn>( UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	ControlledPawn = Cast<ADNM_PlayerPawn>( UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (!ControlledPawn)
 	{
@@ -172,7 +181,24 @@ void ADNM_PlayerController::UpdateWidgetClock(const float NewTime)
 void ADNM_PlayerController::ReturnPlayerBullet(const int32 BulletNumber)
 {
 	PlayerBullets += BulletNumber;
-	PlayerWidgetRef->UpdateBulletCount(FText::FromString(FString::FromInt(PlayerBullets)));
+	if (PlayerWidgetRef)
+	{
+		PlayerWidgetRef->UpdateBulletCount(FText::FromString(FString::FromInt(PlayerBullets)));
+	}
+}
+
+void ADNM_PlayerController::EnemyHasDied()
+{
+	EnemiesKilled += 1;
+	if (PlayerWidgetRef)
+	{
+		PlayerWidgetRef->UpdateEnemyKilledCount(FText::FromString(FString::FromInt(EnemiesKilled)));
+	}
+	
+	if (GameStateRef)
+	{
+		GameStateRef->EnemyHasDied();
+	}
 }
 
 

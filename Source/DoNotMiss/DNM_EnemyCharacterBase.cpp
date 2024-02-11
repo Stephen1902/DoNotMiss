@@ -92,6 +92,8 @@ void ADNM_EnemyCharacterBase::EnemyHasDied()
 		{
 			
 		}
+		
+		PlayerController->EnemyHasDied();
 	}
 
 	GetMesh()->SetSimulatePhysics(true);

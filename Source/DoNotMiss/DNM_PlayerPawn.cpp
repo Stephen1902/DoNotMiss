@@ -24,9 +24,6 @@ ADNM_PlayerPawn::ADNM_PlayerPawn()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
 
-	//bGameIsRunning = false;
-
-	// TODO Fix so game running is controlled by the player controller
 	bGameIsRunning = true;
 }
 
@@ -43,7 +40,7 @@ void ADNM_PlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-//	if (bGameIsRunning)
+	if (bGameIsRunning)
 	{
 		RotatePlayer(DeltaTime);
 	}

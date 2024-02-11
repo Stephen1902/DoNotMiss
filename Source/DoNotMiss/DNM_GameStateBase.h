@@ -49,6 +49,8 @@ class DONOTMISS_API ADNM_GameStateBase : public AGameStateBase
 public:
 	void SetGameIsRunning(const bool GameRunningIn);
 
+	void EnemyHasDied();
+
 	UPROPERTY()
 	FOnClockUpdated OnClockUpdated;
 protected:

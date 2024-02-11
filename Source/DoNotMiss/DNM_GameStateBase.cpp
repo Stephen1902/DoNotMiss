@@ -40,8 +40,7 @@ void ADNM_GameStateBase::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GameStateBase failed to find any EnemySpawnTargetPoints"));
 	}
-
-	GetWorld()->GetTimerManager().SetTimer(UpdateClockTimer, this, &ADNM_GameStateBase::UpdateClock, 0.1f, true, 0.1f);
+	
 }
 
 void ADNM_GameStateBase::Tick(float DeltaSeconds)
@@ -50,7 +49,6 @@ void ADNM_GameStateBase::Tick(float DeltaSeconds)
 
 	if (bGameIsRunning)
 	{
-		TimePlayerAlive += DeltaSeconds;
 		TryToSpawnNewEnemy(DeltaSeconds);
 	}
 }
@@ -95,15 +93,17 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 
 void ADNM_GameStateBase::UpdateClock()
 {
+	TimePlayerAlive += 0.1f;
 	OnClockUpdated.Broadcast(TimePlayerAlive);
 }
 
 void ADNM_GameStateBase::SetGameIsRunning(const bool GameRunningIn)
 {
 	bGameIsRunning = GameRunningIn;
-	if (!bGameIsRunning)
+
+	if (GetWorld()->GetTimerManager().IsTimerActive(UpdateClockTimer))
 	{
-		if (GetWorld()->GetTimerManager().IsTimerActive(UpdateClockTimer))
+		if (!bGameIsRunning)
 		{
 			GetWorld()->GetTimerManager().PauseTimer(UpdateClockTimer);
 		}
@@ -112,4 +112,13 @@ void ADNM_GameStateBase::SetGameIsRunning(const bool GameRunningIn)
 			GetWorld()->GetTimerManager().UnPauseTimer(UpdateClockTimer);
 		}
 	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(UpdateClockTimer, this, &ADNM_GameStateBase::UpdateClock, 0.1f, true, 0.1f);
+	}
+}
+
+void ADNM_GameStateBase::EnemyHasDied()
+{
+	CurrentEnemiesAlive -= 1;
 }
