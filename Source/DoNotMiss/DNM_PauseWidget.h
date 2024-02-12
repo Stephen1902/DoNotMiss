@@ -13,5 +13,10 @@ UCLASS()
 class DONOTMISS_API UDNM_PauseWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	void SetPlayerControllerRef(class ADNM_PlayerController* ControllerRefIn);
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Player Controller")
+	ADNM_PlayerController* PlayerControllerRef;
 };

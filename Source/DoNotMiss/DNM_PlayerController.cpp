@@ -23,7 +23,7 @@ ADNM_PlayerController::ADNM_PlayerController()
 void ADNM_PlayerController::GameHasStarted()
 {
 	bGameIsRunning = true;
-
+	
 	if (GameStateRef && ControlledPawn)
 	{
 		ControlledPawn->SetGameIsRunning(true);
@@ -110,6 +110,7 @@ void ADNM_PlayerController::CreatePlayerWidgets()
 	if (PauseWidget)
 	{
 		PauseWidgetRef = CreateWidget<UDNM_PauseWidget>(this, PauseWidget);
+		PauseWidgetRef->SetPlayerControllerRef(this);
 	}
 	else
 	{
@@ -120,28 +121,29 @@ void ADNM_PlayerController::CreatePlayerWidgets()
 
 void ADNM_PlayerController::TogglePauseWidget()
 {
-	bGameIsRunning = !bGameIsRunning;
-
-	// Tell the game state and Player Pawn the game status has changed
-	if (GameStateRef && ControlledPawn)
-	{
-		ControlledPawn->SetGameIsRunning(bGameIsRunning);
-		GameStateRef->SetGameIsRunning(bGameIsRunning);
-	}
-	
-	// Check we have a Player Widget and Pause Widget set
 	if (PlayerWidgetRef && PauseWidgetRef)
 	{
-		if (!bGameIsRunning)
+		if (!PauseWidgetRef->IsInViewport())
 		{
-			// Remove the player widget and add the pause widget
+			bGameIsRunning = false;
+	
+			// Tell the game state and Player Pawn the game status has changed
+			if (GameStateRef && ControlledPawn)
+			{
+				ControlledPawn->SetGameIsRunning(bGameIsRunning);
+				GameStateRef->SetGameIsRunning(bGameIsRunning);
+			}
+
+			// Remove the player widget
 			PlayerWidgetRef->RemoveFromParent();
+			// Add the Pause Widget to the viewport
 			PauseWidgetRef->AddToViewport();
 		}
 		else
 		{
-			// Remove the pause widget and return the player widget
+			// Remove the Pause Widget
 			PauseWidgetRef->RemoveFromParent();
+			// Add the Player Widget to the viewport
 			PlayerWidgetRef->AddToViewport();
 		}
 	}
