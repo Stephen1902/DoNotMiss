@@ -1,10 +1,7 @@
 // Copyright 2024 DME Games
 
 #include "DNM_PlayerPawn.h"
-
 #include "DNM_PlayerController.h"
-#include "DNM_WeaponBase.h"
-#include "DoNotMissGameModeBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,7 +29,11 @@ void ADNM_PlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerController = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PlayerControllerRef = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PlayerControllerRef)
+	{
+		PlayerControllerRef->OnGameRunningChanged.AddDynamic(this, &ADNM_PlayerPawn::SetGameIsRunning);
+	}
 }
 
 // Called every frame
@@ -55,16 +56,21 @@ void ADNM_PlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ADNM_PlayerPawn::RotatePlayer(float DeltaTime)
 {
-	if (PlayerController)
+	if (PlayerControllerRef)
 	{
 		FHitResult HitResult;
-		PlayerController->GetHitResultUnderCursorByChannel(TraceTypeQuery2, false, HitResult);
+		PlayerControllerRef->GetHitResultUnderCursorByChannel(TraceTypeQuery2, false, HitResult);
 		const FRotator LookAtRot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), HitResult.ImpactPoint);
 		const FRotator MouseRotation = FRotator(0.f, LookAtRot.Yaw, 0.f);
 		
 		const FRotator NewActorRotation = UKismetMathLibrary::RInterpTo(GetActorRotation(), MouseRotation, DeltaTime, 2.0f );
 		SetActorRotation(NewActorRotation);
 	}
+}
+
+void ADNM_PlayerPawn::SetGameIsRunning(const bool GameStatusIn)
+{
+	bGameIsRunning = GameStatusIn;
 }
 
 

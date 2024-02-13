@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "DNM_PlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameRunningChanged, bool, GameRunningStatus);
+
 class ADNM_WeaponBase;
 /**
  * 
@@ -24,7 +26,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Pause Menu")
 	void TogglePauseWidget();
-	
+
+	UPROPERTY()
+	FOnGameRunningChanged OnGameRunningChanged;
 protected:
 	ADNM_PlayerController();
 	

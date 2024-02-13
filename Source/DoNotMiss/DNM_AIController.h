@@ -32,4 +32,10 @@ private:
 
 	UFUNCTION()
 	void StartToMove();
+	
+	UPROPERTY()
+	class ADNM_PlayerController* PlayerControllerRef;
+	
+	UFUNCTION()
+	void SetGameIsRunning(const bool GameStatusIn);
 };

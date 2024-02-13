@@ -19,7 +19,6 @@ public:
 
 	USkeletalMeshComponent* GetSkeletalMeshComp() const { return SkeletalMeshComponent; }
 
-	void SetGameIsRunning(const bool GameIsRunningIn) { bGameIsRunning = GameIsRunningIn; }
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,10 +44,12 @@ public:
 
 private:
 	UPROPERTY()
-	APlayerController* PlayerController;
+	class ADNM_PlayerController* PlayerControllerRef;
 
 	void RotatePlayer(float DeltaTime);
-	
+
+	UFUNCTION()
+	void SetGameIsRunning(const bool GameStatusIn);
 	bool bGameIsRunning;
 };
 

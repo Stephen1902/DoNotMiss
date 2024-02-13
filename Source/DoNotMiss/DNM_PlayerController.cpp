@@ -23,12 +23,9 @@ ADNM_PlayerController::ADNM_PlayerController()
 void ADNM_PlayerController::GameHasStarted()
 {
 	bGameIsRunning = true;
-	
-	if (GameStateRef && ControlledPawn)
-	{
-		ControlledPawn->SetGameIsRunning(true);
-		GameStateRef->SetGameIsRunning(true);
-	}
+
+	// Tell and classes listening that the game status has changed
+	OnGameRunningChanged.Broadcast(true);
 }
 
 void ADNM_PlayerController::BeginPlay()
@@ -126,14 +123,10 @@ void ADNM_PlayerController::TogglePauseWidget()
 		if (!PauseWidgetRef->IsInViewport())
 		{
 			bGameIsRunning = false;
-	
-			// Tell the game state and Player Pawn the game status has changed
-			if (GameStateRef && ControlledPawn)
-			{
-				ControlledPawn->SetGameIsRunning(bGameIsRunning);
-				GameStateRef->SetGameIsRunning(bGameIsRunning);
-			}
 
+			// Tell and classes listening that the game status has changed
+			OnGameRunningChanged.Broadcast(bGameIsRunning);
+			
 			// Remove the player widget
 			PlayerWidgetRef->RemoveFromParent();
 			// Add the Pause Widget to the viewport

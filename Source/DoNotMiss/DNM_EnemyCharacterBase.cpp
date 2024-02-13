@@ -64,8 +64,7 @@ void ADNM_EnemyCharacterBase::BeginPlay()
 		ADNM_AIController* PawnController = GetWorld()->SpawnActor<ADNM_AIController>(AIControllerClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
 		PawnController->Possess(this);
 	}
-	
-}
+	}
 
 // Called every frame
 void ADNM_EnemyCharacterBase::Tick(float DeltaTime)

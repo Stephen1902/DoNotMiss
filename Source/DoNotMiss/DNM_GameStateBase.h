@@ -47,8 +47,6 @@ class DONOTMISS_API ADNM_GameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	void SetGameIsRunning(const bool GameRunningIn);
-
 	void EnemyHasDied();
 
 	UPROPERTY()
@@ -86,4 +84,11 @@ private:
 	float TimePlayerAlive = 0.0f;
 	void UpdateClock();
 	FTimerHandle UpdateClockTimer;
+
+	UPROPERTY()
+	class ADNM_PlayerController* PlayerControllerRef;
+
+	UFUNCTION()
+	void SetGameIsRunning(const bool GameRunningIn);
+
 };
