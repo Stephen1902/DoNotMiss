@@ -3,8 +3,10 @@
 
 #include "DNM_EnemyCharacterBase.h"
 #include "DNM_AIController.h"
+#include "DNM_PlayerBarrier.h"
 #include "DNM_PlayerController.h"
 #include "DNM_ProjectileBase.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #define ProjectileTrace ECC_GameTraceChannel1 
@@ -21,6 +23,8 @@ ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
 	StartingHealth = 100.f;
 	CurrentHealth = StartingHealth;
 	DelayBeforeMoving = 0.2f;
+	AmmoTakenPerHit = 3;
+	DelayBetweenAmmoTake = 2.0f;
 
 	static ConstructorHelpers::FClassFinder<ADNM_AIController> FoundAIController(TEXT("/Game/Blueprints/Enemies/BP_AIController"));
 	if (FoundAIController.Succeeded())
@@ -64,7 +68,14 @@ void ADNM_EnemyCharacterBase::BeginPlay()
 		ADNM_AIController* PawnController = GetWorld()->SpawnActor<ADNM_AIController>(AIControllerClass, GetActorLocation(), GetActorRotation(), SpawnParameters);
 		PawnController->Possess(this);
 	}
+
+	PlayerControllerRef  = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PlayerControllerRef)
+	{
+		PlayerControllerRef->OnGameRunningChanged.AddDynamic(this, &ADNM_EnemyCharacterBase::SetGameIsRunning);
 	}
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADNM_EnemyCharacterBase::ComponentBeginOverlap);
+}
 
 // Called every frame
 void ADNM_EnemyCharacterBase::Tick(float DeltaTime)
@@ -83,18 +94,56 @@ void ADNM_EnemyCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerI
 void ADNM_EnemyCharacterBase::EnemyHasDied()
 {
 	// Get the player character
-	if (ADNM_PlayerController* PlayerController = Cast<ADNM_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+	if (PlayerControllerRef)
 	{
-		PlayerController->ReturnPlayerBullet(ProjectilesThatHit.Num());
+		PlayerControllerRef->ReturnPlayerBullet(ProjectilesThatHit.Num());
 		// TODO Change this so it returns the actual type of bullet, not just a number of bullets for gun switching later
 		for (int32 i = 0; i < ProjectilesThatHit.Num(); ++i)
 		{
 			
 		}
 		
-		PlayerController->EnemyHasDied();
+		PlayerControllerRef->EnemyHasDied();
 	}
 
 	GetMesh()->SetSimulatePhysics(true);
 	SetLifeSpan(2.0f);
+}
+
+void ADNM_EnemyCharacterBase::TakeEnemyAmmo()
+{
+	if (AmmoTakenPerHit > 0 && PlayerBarrierRef)
+	{
+		PlayerBarrierRef->EnemyHasTakenAmmo(AmmoTakenPerHit);
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Character Base has taken ammo"));
+	}
+}
+
+void ADNM_EnemyCharacterBase::SetGameIsRunning(const bool GameRunningIn)
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(TakeAmmoTimer))
+	{
+		if (!GameRunningIn)
+		{
+			GetWorld()->GetTimerManager().PauseTimer(TakeAmmoTimer);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().UnPauseTimer(TakeAmmoTimer);
+		}
+	}
+
+}
+
+void ADNM_EnemyCharacterBase::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// Only run this code if have not already hit a barrier
+	if (PlayerBarrierRef == nullptr)
+	{
+		if (ADNM_PlayerBarrier* BarrierHit = Cast<ADNM_PlayerBarrier>(OtherActor))
+		{
+			PlayerBarrierRef = BarrierHit;
+			GetWorld()->GetTimerManager().SetTimer(TakeAmmoTimer, this, &ADNM_EnemyCharacterBase::TakeEnemyAmmo, DelayBetweenAmmoTake, true);
+		}
+	}
 }

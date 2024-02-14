@@ -29,6 +29,15 @@ protected:
 	//  After spawning, how long before the enemy moves towards the player
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	float DelayBeforeMoving;
+
+	// When the enemy reaches the player barrier, how many ammo does it remove
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	int32 AmmoTakenPerHit;
+
+	// How long between the enemy taking more ammo
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	float DelayBetweenAmmoTake;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,6 +50,21 @@ public:
 	
 	UPROPERTY()
 	TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
+
+private:
+	FTimerHandle TakeAmmoTimer;
+	void TakeEnemyAmmo();
+
+	UPROPERTY()
+	class ADNM_PlayerBarrier* PlayerBarrierRef;
+
+	UPROPERTY()
+	class ADNM_PlayerController* PlayerControllerRef;
+
+	UFUNCTION()
+	void SetGameIsRunning(const bool GameRunningIn);
 	
+	UFUNCTION()
+	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };
 
