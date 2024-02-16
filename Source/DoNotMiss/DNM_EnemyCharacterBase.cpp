@@ -46,7 +46,7 @@ void ADNM_EnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* Projectile
 		{
 			CurrentHealth -= DamagedCaused;
 
-			UE_LOG(LogTemp, Warning, TEXT("Current Health of %s is %f"), *GetName(), CurrentHealth);
+			//UE_LOG(LogTemp, Warning, TEXT("Current Health of %s is %f"), *GetName(), CurrentHealth);
 			if (CurrentHealth <= 0)
 			{
 				EnemyHasDied();
@@ -96,7 +96,7 @@ void ADNM_EnemyCharacterBase::EnemyHasDied()
 	// Get the player character
 	if (PlayerControllerRef)
 	{
-		PlayerControllerRef->ReturnPlayerBullet(ProjectilesThatHit.Num());
+		PlayerControllerRef->AlterPlayerBullet(ProjectilesThatHit.Num());
 		// TODO Change this so it returns the actual type of bullet, not just a number of bullets for gun switching later
 		for (int32 i = 0; i < ProjectilesThatHit.Num(); ++i)
 		{
@@ -106,16 +106,22 @@ void ADNM_EnemyCharacterBase::EnemyHasDied()
 		PlayerControllerRef->EnemyHasDied();
 	}
 
+	// If the timer is running for this character to take some ammo, clear it before destroying
+	if (GetWorld()->GetTimerManager().IsTimerActive(TakeAmmoTimer))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TakeAmmoTimer);
+	}
+	
 	GetMesh()->SetSimulatePhysics(true);
 	SetLifeSpan(2.0f);
 }
 
 void ADNM_EnemyCharacterBase::TakeEnemyAmmo()
 {
-	if (AmmoTakenPerHit > 0 && PlayerBarrierRef)
+	if (AmmoTakenPerHit > 0 && PlayerBarrierRef && PlayerControllerRef)
 	{
 		PlayerBarrierRef->EnemyHasTakenAmmo(AmmoTakenPerHit);
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Character Base has taken ammo"));
+		PlayerControllerRef->AlterPlayerBullet(AmmoTakenPerHit * -1);
 	}
 }
 

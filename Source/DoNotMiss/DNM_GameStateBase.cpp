@@ -11,6 +11,7 @@ ADNM_GameStateBase::ADNM_GameStateBase()
 {
 	// Set this to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 0.05f;
 
 	CurrentLevel = 0;
 	LastSpawnPointUsed = -1;
@@ -78,6 +79,7 @@ void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
 				{
 					LastSpawnPointUsed = RandomSpawnPoint;
 					TimeSinceLastSpawn = 0.f;
+					CurrentEnemiesAlive += 1;
 					SpawnNewEnemy(EnemySpawnTargetPoints[RandomSpawnPoint]);
 				}
 			}
@@ -93,7 +95,6 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
 		GetWorld()->SpawnActor<ADNM_EnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
-		CurrentEnemiesAlive += 1;
 	}
 }
 
