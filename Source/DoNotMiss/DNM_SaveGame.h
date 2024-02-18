@@ -27,4 +27,6 @@ public:
 	void ResetSavedStats();
 
 	void GetHighScores(float& TimeSurvived, int32& EnemiesKilled);
+
+	void SetNewHighScores(float NewTimeSurvived, int32 NewEnemiesKilled);
 };

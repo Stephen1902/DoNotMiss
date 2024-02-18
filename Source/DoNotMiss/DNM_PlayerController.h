@@ -86,6 +86,7 @@ private:
 	bool bGameIsRunning;
 	bool bGameIsPaused;
 
+	float TimeSurvived;
 	FString TimeSurvivedAsString;
 	int32 PlayerBullets;
 	int32 EnemiesKilled;
@@ -93,4 +94,15 @@ private:
 	float TimeBetweenFiring;
 	float TimeSinceLastFired;
 	void TryToFire();
+
+	UPROPERTY()
+	class USaveGame* SaveGameRef;
+	
+	UPROPERTY()
+	class UDNM_SaveGame* ThisSaveGameRef;
+	
+	FString SaveGameSlot;
+	float SavedTimeSurvived;
+	int32 SavedEnemiesKilled;
+
 };

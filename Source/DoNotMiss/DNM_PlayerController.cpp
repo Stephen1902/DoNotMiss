@@ -7,7 +7,9 @@
 #include "DNM_PlayerWidget.h"
 #include "DNM_PauseWidget.h"
 #include "DNM_GameOverWidget.h"
+#include "DNM_SaveGame.h"
 #include "Kismet/GameplayStatics.h"
+
 
 ADNM_PlayerController::ADNM_PlayerController()
 {
@@ -20,6 +22,10 @@ ADNM_PlayerController::ADNM_PlayerController()
 	PlayerBullets = 0;
 	EnemiesKilled = 0;
 	bGameIsRunning = false;
+	bGameIsPaused = false;
+	SavedTimeSurvived = 0.0f;
+	SavedEnemiesKilled = 0;
+	SaveGameSlot = "Slot0";
 }
 
 void ADNM_PlayerController::GameHasStarted()
@@ -177,6 +183,7 @@ void ADNM_PlayerController::UpdateWidgetClock(const float NewTime)
 {
 	if (PlayerWidgetRef)
 	{
+		TimeSurvived = NewTime;
 		TimeSurvivedAsString = FString::SanitizeFloat(NewTime, 2);
 		const int32 DecimalPointPos = TimeSurvivedAsString.Find(".");
 		TimeSurvivedAsString = TimeSurvivedAsString.Left(DecimalPointPos + 2) + "0";
@@ -205,6 +212,48 @@ void ADNM_PlayerController::AlterPlayerBullet(const int32 BulletNumber)
 			PlayerWidgetRef->RemoveFromParent();
 			GameOverWidgetRef->AddToViewport();
 			GameOverWidgetRef->SetTimeSurvivedAsText(TimeSurvivedAsString, FText::FromString(FString::FromInt(EnemiesKilled)));
+		}
+
+		// Check if a saved game already exists and if not, create it
+		if (UGameplayStatics::DoesSaveGameExist(SaveGameSlot, 0))
+		{
+			SaveGameRef = UGameplayStatics::LoadGameFromSlot(SaveGameSlot, 0);
+		}
+		else
+		{
+			SaveGameRef = Cast<UDNM_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDNM_SaveGame::StaticClass()));
+		}
+
+		// Cast to the specific instance of the SaveGame class for the HighScore variable
+		ThisSaveGameRef = Cast<UDNM_SaveGame>(SaveGameRef);
+	
+		if (ThisSaveGameRef)
+		{
+			ThisSaveGameRef->GetHighScores(SavedTimeSurvived, SavedEnemiesKilled);
+
+			// Check if the scores for this game are higher than the scores retrieved from the saved game
+			if (TimeSurvived > SavedTimeSurvived || EnemiesKilled > SavedEnemiesKilled)
+			{
+				ThisSaveGameRef->SetNewHighScores(TimeSurvived,  EnemiesKilled);
+
+				if (UGameplayStatics::SaveGameToSlot(ThisSaveGameRef, SaveGameSlot, 0))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Game Saved"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Game failed to save"));
+				}
+
+				if (GameOverWidgetRef)
+				{
+					GameOverWidgetRef->NewHighScore();
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to get UDNM_SaveGame in Player Controller"));
 		}
 	}
 }

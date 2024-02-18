@@ -21,3 +21,9 @@ void UDNM_SaveGame::GetHighScores(float& TimeSurvived, int32& EnemiesKilled)
 	TimeSurvived = SavedTimeSurvived;
 	EnemiesKilled = SavedEnemiesKilled;
 }
+
+void UDNM_SaveGame::SetNewHighScores(float NewTimeSurvived, int32 NewEnemiesKilled)
+{
+	SavedTimeSurvived = NewTimeSurvived;
+	SavedEnemiesKilled= NewEnemiesKilled;
+}

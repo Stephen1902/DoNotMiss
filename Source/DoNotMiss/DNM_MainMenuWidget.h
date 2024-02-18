@@ -14,17 +14,19 @@ class DONOTMISS_API UDNM_MainMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void SetGameModeRef(class ADoNotMissGameModeBase* GameModeIn);
 protected:
 	UFUNCTION(BlueprintCallable, Category = "About Tab")
 	void GetHighScoresFromGameBase();
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayHighScores(const float& TimeSurvived, const int32& EnemiesKilled);
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Mode")
+	ADoNotMissGameModeBase* GameModeRef;
+
 private:
-	UPROPERTY()
-	class ADoNotMissGameModeBase* GameModeRef;
-	
 	float TimeSurvivedHighScore;
 	int32 EnemiesKilledHighScore;
 };

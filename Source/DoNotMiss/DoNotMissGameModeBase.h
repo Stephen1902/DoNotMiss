@@ -16,7 +16,16 @@ class DONOTMISS_API ADoNotMissGameModeBase : public AGameModeBase
 
 public:
 	void GetHighScores(float& TimeSurvived, int32& EnemiesKilled) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Game Mode Functions")
+	bool ResetHighScores();
+protected:
+	ADoNotMissGameModeBase();
 	
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Set Up")
+	TSubclassOf<class UDNM_MainMenuWidget> MainMenuWidget;
 private:
 	UPROPERTY()
 	class USaveGame* SaveGameRef;
@@ -29,4 +38,8 @@ private:
 
 	float TimeSurvivedHighScore;
 	int32 EnemiesKilledHighScore;
+
+	void CreateMainMenuWidget();
+	UPROPERTY()
+	UDNM_MainMenuWidget* MainMenuRef;
 };

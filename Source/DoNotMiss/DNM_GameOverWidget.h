@@ -17,7 +17,11 @@ class DONOTMISS_API UDNM_GameOverWidget : public UUserWidget
 public:
 	void SetTimeSurvivedAsText(FString& TimeAsString, const FText& EnemiesKilledAsText);
 
+	void NewHighScore();
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnGameOver(const FText& TimeSurvivedText, const FText& EnemiesKilledText);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnNewHighScore();
 };

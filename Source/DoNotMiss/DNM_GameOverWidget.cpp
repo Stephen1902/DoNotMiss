@@ -11,3 +11,8 @@ void UDNM_GameOverWidget::SetTimeSurvivedAsText(FString& TimeAsString, const FTe
 		OnGameOver(FText::FromString(TimeAsString), EnemiesKilledAsText);
 	}
 }
+
+void UDNM_GameOverWidget::NewHighScore()
+{
+	OnNewHighScore();
+}
