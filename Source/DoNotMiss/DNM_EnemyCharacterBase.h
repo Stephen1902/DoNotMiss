@@ -16,7 +16,7 @@ public:
 	ADNM_EnemyCharacterBase();
 
 	// Called when a projectile hits this enemy
-	void DealWithProjectile(class ADNM_ProjectileBase* ProjectileThatHit);
+	void DealWithProjectile(class ADNM_ProjectileBase* ProjectileThatHit, float DamageCaused);
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,6 +37,15 @@ protected:
 	// How long between the enemy taking more ammo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	float DelayBetweenAmmoTake;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	class UWidgetComponent* EnemyHealthWidgetComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	FLinearColor HealthBarColour;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHealthChanged(const float& HealthPercentage);
 	
 public:	
 	// Called every frame
@@ -50,6 +59,7 @@ public:
 	
 	UPROPERTY()
 	TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
+	//TMap<ADNM_ProjectileBase*, float> ProjectilesThatHit;
 
 private:
 	FTimerHandle TakeAmmoTimer;

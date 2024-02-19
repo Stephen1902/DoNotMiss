@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	ADNM_ProjectileBase();
 
-	int32 GetDamagePerBullet() const { return DamagePerBullet; }
+	float GetDamagePerBullet() const { return DamagePerBullet * DamageDivision; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,8 +30,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	class UProjectileMovementComponent* ProjectileMovementComp;
 
+	// The amount of damage each piece of ammo causes
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
-	int32 DamagePerBullet;
+	float DamagePerBullet;
+
+	// Amount the damage needs to be divided by ie, if bullet is a shotgun shell
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up", meta=(ClampMin=1.0f))
+	float DamageDivision;
 
 	UFUNCTION()
 	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);

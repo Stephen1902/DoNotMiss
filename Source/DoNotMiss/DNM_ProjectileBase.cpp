@@ -20,7 +20,8 @@ ADNM_ProjectileBase::ADNM_ProjectileBase()
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	
 	// Set default variables
-	DamagePerBullet = 34;
+	DamagePerBullet = 34.0f;
+	DamageDivision = 1.0f;
 }
 
 // Called when the game starts or when spawned
@@ -49,7 +50,7 @@ void ADNM_ProjectileBase::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (ADNM_EnemyCharacterBase* EnemyHit = Cast<ADNM_EnemyCharacterBase>(OtherActor))
 	{
-		EnemyHit->DealWithProjectile(this);
+		EnemyHit->DealWithProjectile(this, DamagePerBullet / DamageDivision);
 		GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &ADNM_ProjectileBase::DestroyAfterDelay, 0.03333f, false);
 	}
 	

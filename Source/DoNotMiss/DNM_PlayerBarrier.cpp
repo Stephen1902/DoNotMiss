@@ -22,6 +22,9 @@ ADNM_PlayerBarrier::ADNM_PlayerBarrier()
 	MeshComp->SetupAttachment(CollisionComp);
 
 	BarrierWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
+	BarrierWidget->SetupAttachment(RootComp);
+	BarrierWidget->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	
 }
 
 void ADNM_PlayerBarrier::EnemyHasTakenAmmo(const int32 NumAmmoTaken)
