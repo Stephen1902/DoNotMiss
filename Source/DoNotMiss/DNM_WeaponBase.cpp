@@ -6,6 +6,7 @@
 #include "DNM_ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 ADNM_WeaponBase::ADNM_WeaponBase()
@@ -25,7 +26,9 @@ ADNM_WeaponBase::ADNM_WeaponBase()
 	CurrentAmmo = StartingAmmo;
 	bBurstFire = false;
 	NumberPerBurst = 1;
+	NumberFiredBurst = 0;
 	TimeBetweenFiring = 0.5f;
+	TimeBetweenBurstFire = 0.2f;
 }
 
 int32 ADNM_WeaponBase::GetBulletsPerFire() const
@@ -42,7 +45,6 @@ int32 ADNM_WeaponBase::GetBulletsPerFire() const
 void ADNM_WeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -64,18 +66,39 @@ bool ADNM_WeaponBase::TryToFire()
 
 void ADNM_WeaponBase::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire!"));
 	const FActorSpawnParameters SpawnParameters;
 	const FTransform SocketTransform = MeshComp->GetSocketTransform(FName("FiringSocket"));
 	ADNM_ProjectileBase* SpawnedBullet = GetWorld()->SpawnActor<ADNM_ProjectileBase>(BulletToSpawn, SocketTransform, SpawnParameters);
 
-	//UGameplayStatics::SetGamePaused(GetWorld(), true);
-	
-	const FString StringToDisplay = "X: " + FString::SanitizeFloat(SocketTransform.GetLocation().X) + " Y: " + FString::SanitizeFloat(SocketTransform.GetLocation().Y) + " Z: " + FString::SanitizeFloat(SocketTransform.GetLocation().Z);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, StringToDisplay);
+	if (SoundOnFire)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), SoundOnFire);
+	}
 
-	// const FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
-	// SpawnedBullet->AttachToComponent(MeshComp, TransformRules, FName("FiringSocket"));
+	if (FireParticle)
+	{
+		FTransform GunMuzzleTransform = MeshComp->GetSocketTransform(FName("MuzzleFlashSocket"));
+		GunMuzzleTransform.SetScale3D(FVector(0.25f));
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireParticle, GunMuzzleTransform);		
+	}
 
+	if (bBurstFire && !GetWorld()->GetTimerManager().IsTimerActive(BurstFireTimer))
+	{
+		NumberFiredBurst = NumberPerBurst - 1;
+		GetWorld()->GetTimerManager().SetTimer(BurstFireTimer, this, &ADNM_WeaponBase::FireOnTimer,TimeBetweenBurstFire, true);
+	}
+}
+
+void ADNM_WeaponBase::FireOnTimer()
+{
+	if (NumberFiredBurst > 0)
+	{
+		NumberFiredBurst -= 1;
+		Fire();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(BurstFireTimer);
+	}
 }
 

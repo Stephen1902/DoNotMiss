@@ -33,6 +33,9 @@ USTRUCT(BlueprintType) struct FReloadStruct
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Weapon Reload")
 	bool bAutoReload;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Weapon Reload")
+	USoundBase* SoundOnReload;
+
 	FReloadStruct()
 	{
 		bWeaponReloads = false;
@@ -40,6 +43,7 @@ USTRUCT(BlueprintType) struct FReloadStruct
 		CurrentInClip = MaxInClip;
 		ReloadTime = 1.0f;
 		bAutoReload = true;
+		SoundOnReload = nullptr;
 	}
 };
 
@@ -82,10 +86,19 @@ protected:
 	FReloadStruct ReloadStruct;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	UParticleSystem* FireParticle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	USoundBase* SoundOnFire;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	bool bBurstFire;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up", meta=(EditCondition="bBurstFire"))
 	int32 NumberPerBurst;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up", meta=(EditCondition="bBurstFire"))
+	float TimeBetweenBurstFire;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	TSubclassOf<class ADNM_ProjectileBase> BulletToSpawn;
@@ -97,4 +110,8 @@ public:
 private:
 	int32 CurrentAmmo;
 	void Fire();
+	void FireOnTimer();
+
+	FTimerHandle BurstFireTimer;
+	int32 NumberFiredBurst;
 };
