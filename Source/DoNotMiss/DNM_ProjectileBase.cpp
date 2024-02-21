@@ -24,6 +24,11 @@ ADNM_ProjectileBase::ADNM_ProjectileBase()
 	DamageDivision = 1.0f;
 }
 
+void ADNM_ProjectileBase::SetDamageDivision(const float DivisionIn)
+{
+	DamageDivision = DivisionIn;
+}
+
 // Called when the game starts or when spawned
 void ADNM_ProjectileBase::BeginPlay()
 {

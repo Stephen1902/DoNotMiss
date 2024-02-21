@@ -67,8 +67,29 @@ bool ADNM_WeaponBase::TryToFire()
 void ADNM_WeaponBase::Fire()
 {
 	const FActorSpawnParameters SpawnParameters;
-	const FTransform SocketTransform = MeshComp->GetSocketTransform(FName("FiringSocket"));
-	ADNM_ProjectileBase* SpawnedBullet = GetWorld()->SpawnActor<ADNM_ProjectileBase>(BulletToSpawn, SocketTransform, SpawnParameters);
+	FTransform SocketTransform = MeshComp->GetSocketTransform(FName("FiringSocket"));
+	if (WeaponType == EWeaponType::WT_Shotgun)
+	{
+		for (int32 i = 0; i < 12; ++i)
+		{
+			FVector SocketLocation = SocketTransform.GetLocation();
+			SocketLocation.X = SocketLocation.X + FMath::FRandRange(-25.f, 25.f);
+			SocketLocation.Y = SocketLocation.Y + FMath::FRandRange(-25.f, 25.f);
+			SocketLocation.Z = SocketLocation.Z + FMath::FRandRange(-10.f, 10.f);
+			ADNM_ProjectileBase* SpawnedBullet = GetWorld()->SpawnActor<ADNM_ProjectileBase>(BulletToSpawn, SocketLocation, SocketTransform.GetRotation().Rotator(), SpawnParameters);
+			SpawnedBullet->SetDamageDivision(12);
+
+			if (EjectShellToSpawn)
+			{
+				FTransform ShellEjectTransform = MeshComp->GetSocketTransform(FName("b_gun_shelleject"));
+				GetWorld()->SpawnActor<ADNM_ProjectileBase>(EjectShellToSpawn, ShellEjectTransform, SpawnParameters);		
+			}
+		}
+	}
+	else
+	{
+		ADNM_ProjectileBase* SpawnedBullet = GetWorld()->SpawnActor<ADNM_ProjectileBase>(BulletToSpawn, SocketTransform, SpawnParameters);
+	}
 
 	if (SoundOnFire)
 	{

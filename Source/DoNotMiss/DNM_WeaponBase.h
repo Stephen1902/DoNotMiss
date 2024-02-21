@@ -103,6 +103,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
 	TSubclassOf<class ADNM_ProjectileBase> BulletToSpawn;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Set Up")
+	TSubclassOf<ADNM_ProjectileBase> EjectShellToSpawn;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
