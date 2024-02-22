@@ -82,7 +82,7 @@ void ADNM_WeaponBase::Fire()
 			if (EjectShellToSpawn)
 			{
 				FTransform ShellEjectTransform = MeshComp->GetSocketTransform(FName("b_gun_shelleject"));
-				GetWorld()->SpawnActor<ADNM_ProjectileBase>(EjectShellToSpawn, ShellEjectTransform, SpawnParameters);		
+				GetWorld()->SpawnActor<ADNM_ProjectileBase>(EjectShellToSpawn, ShellEjectTransform, SpawnParameters);
 			}
 		}
 	}
