@@ -11,7 +11,6 @@ ADNM_GameStateBase::ADNM_GameStateBase()
 {
 	// Set this to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.05f;
 
 	CurrentLevel = 0;
 	LastSpawnPointUsed = -1;
@@ -127,5 +126,19 @@ void ADNM_GameStateBase::SetGameIsRunning(const bool GameRunningIn)
 
 void ADNM_GameStateBase::EnemyHasDied()
 {
-	CurrentEnemiesAlive -= 1;
+	//  Randomly generate a chance to spawn an extra enemy
+	if (CurrentEnemiesAlive == LevelInfo[CurrentLevel].MaxEnemiesAlive)
+	{
+		const float RandomChance = FMath::FRandRange(0.f, 100.f);
+		// If the random chance is less than the spawn chance, remove an additional enemy count
+		if (RandomChance < LevelInfo[CurrentLevel].ChanceOfAdditionalEnemySpawn)
+		{
+			CurrentEnemiesAlive -= 1;	
+		}
+	}
+	else
+	{
+		CurrentEnemiesAlive -= 1;	
+	}
+	
 }

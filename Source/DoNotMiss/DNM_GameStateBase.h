@@ -25,6 +25,9 @@ struct FLevelInfoStruct
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
 	int32 MaxEnemiesAlive;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	float ChanceOfAdditionalEnemySpawn;
+
 	// Time in seconds between enemy attempts to spawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
 	float TimeBetweenSpawns;
@@ -35,6 +38,7 @@ struct FLevelInfoStruct
 		NumberOfEnemies = 10;
 		MaxEnemiesAlive = 4;
 		TimeBetweenSpawns = 1.0f;
+		ChanceOfAdditionalEnemySpawn = 25.f;
 	}
 };
 
