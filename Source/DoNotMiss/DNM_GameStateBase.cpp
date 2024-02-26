@@ -133,12 +133,11 @@ void ADNM_GameStateBase::EnemyHasDied()
 		// If the random chance is less than the spawn chance, remove an additional enemy count
 		if (RandomChance < LevelInfo[CurrentLevel].ChanceOfAdditionalEnemySpawn)
 		{
-			CurrentEnemiesAlive -= 1;	
+			CurrentEnemiesAlive -= 1;
+			LevelInfo[CurrentLevel].MaxEnemiesAlive += 1;
 		}
 	}
-	else
-	{
-		CurrentEnemiesAlive -= 1;	
-	}
+
+	CurrentEnemiesAlive -= 1;	
 	
 }

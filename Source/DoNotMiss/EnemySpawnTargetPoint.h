@@ -18,6 +18,6 @@ protected:
 	AEnemySpawnTargetPoint();
 	
 	UPROPERTY(VisibleAnywhere, Category = "Arrow Comp")
-	UArrowComponent* ArrowComp;
+	class UArrowComponent* ArrowComp;
 	
 };

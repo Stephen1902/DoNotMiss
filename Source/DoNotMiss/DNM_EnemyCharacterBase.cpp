@@ -5,7 +5,6 @@
 #include "DNM_AIController.h"
 #include "DNM_PlayerBarrier.h"
 #include "DNM_PlayerController.h"
-#include "DNM_ProjectileBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,6 +17,22 @@ ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	HairMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair Mesh"));
+	HairMesh->SetupAttachment(GetMesh());
+	HairMesh->SetMasterPoseComponent(GetMesh());
+
+	ShirtMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Shirt Mesh"));
+	ShirtMesh->SetupAttachment(GetMesh());
+	ShirtMesh->SetMasterPoseComponent(GetMesh());
+
+	TrousersMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Trousers Mesh"));
+	TrousersMesh->SetupAttachment(GetMesh());
+	TrousersMesh->SetMasterPoseComponent(GetMesh());
+
+	ShoesMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Shoes Mesh"));
+	ShoesMesh->SetupAttachment(GetMesh());
+	ShoesMesh->SetMasterPoseComponent(GetMesh());
+	
 	EnemyHealthWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Health Component"));
 	EnemyHealthWidgetComp->SetupAttachment(GetCapsuleComponent());
 	EnemyHealthWidgetComp->SetRelativeLocation(FVector(0.f, 0.f, 110.f));
@@ -34,7 +49,9 @@ ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
 	DelayBeforeMoving = 0.2f;
 	AmmoTakenPerHit = 3;
 	DelayBetweenAmmoTake = 2.0f;
+	
 
+	
 	static ConstructorHelpers::FClassFinder<ADNM_AIController> FoundAIController(TEXT("/Game/Blueprints/Enemies/BP_AIController"));
 	if (FoundAIController.Succeeded())
 	{
@@ -110,6 +127,8 @@ void ADNM_EnemyCharacterBase::BeginPlay()
 		PlayerControllerRef->OnGameRunningChanged.AddDynamic(this, &ADNM_EnemyCharacterBase::SetGameIsRunning);
 	}
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ADNM_EnemyCharacterBase::ComponentBeginOverlap);
+
+	SetCharacterParams();
 }
 
 // Called every frame
@@ -186,5 +205,65 @@ void ADNM_EnemyCharacterBase::ComponentBeginOverlap(UPrimitiveComponent* Overlap
 			PlayerBarrierRef = BarrierHit;
 			GetWorld()->GetTimerManager().SetTimer(TakeAmmoTimer, this, &ADNM_EnemyCharacterBase::TakeEnemyAmmo, DelayBetweenAmmoTake, true);
 		}
+	}
+}
+
+void ADNM_EnemyCharacterBase::SetCharacterParams()
+{
+	const int32 RandomCharacterSelect = FMath::RandRange(1, 3);
+	const bool CharHasClothes = FMath::FRandRange(1.f, 100.f) <= 50.f;
+
+	switch (RandomCharacterSelect)
+	{
+		// Options for the Hank Character
+		case 1:
+		default:
+			if (CharHasClothes)
+			{
+				const int32 SelectClothedMeshHank = FMath::RandRange(0, HankBodyMeshOptions.Num() - 1);
+				GetMesh()->SetSkeletalMesh(HankBodyMeshOptions[SelectClothedMeshHank]);
+			}
+			else
+			{
+				GetMesh()->SetSkeletalMesh(HankNoClothesOptions[0]);
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(HankNoClothesOptions[1]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(HankNoClothesOptions[2]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(HankNoClothesOptions[3]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(HankNoClothesOptions[4]); }
+			}
+			break;
+		// Options for Maria Character 
+		case 2:
+			if (CharHasClothes)
+			{
+				const int32 SelectClothedMeshMaria = FMath::RandRange(0, MariaBodyMeshOptions.Num() - 1);
+				GetMesh()->SetSkeletalMesh(MariaBodyMeshOptions[SelectClothedMeshMaria]);
+			}
+			else
+			{
+				GetMesh()->SetSkeletalMesh(MariaNoClothesOptions[0]);
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(MariaNoClothesOptions[1]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(MariaNoClothesOptions[2]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(MariaNoClothesOptions[3]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(MariaNoClothesOptions[4]); }
+		}
+			break;
+
+		// Options for Mike Character
+		case 3:
+			if (CharHasClothes)
+			{
+				const int32 SelectClothedMeshMike = FMath::RandRange(0, MikeBodyMeshOptions.Num() - 1);
+				GetMesh()->SetSkeletalMesh(MikeBodyMeshOptions[SelectClothedMeshMike]);
+			}
+			else
+			{
+				GetMesh()->SetSkeletalMesh(MikeNoClothesOptions[0]);
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(MikeNoClothesOptions[1]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(MikeNoClothesOptions[2]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(MikeNoClothesOptions[3]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(MikeNoClothesOptions[4]); }
+			}
+			break;
 	}
 }

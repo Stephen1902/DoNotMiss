@@ -122,4 +122,3 @@ void ADNM_WeaponBase::FireOnTimer()
 		GetWorld()->GetTimerManager().ClearTimer(BurstFireTimer);
 	}
 }
-
