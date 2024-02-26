@@ -14,7 +14,6 @@ ADNM_GameStateBase::ADNM_GameStateBase()
 
 	CurrentLevel = 0;
 	LastSpawnPointUsed = -1;
-	CurrentEnemiesAlive = 0;
 	EnemiesLeftToSpawn = 0;
 	TimeSinceLastSpawn = 0.0f;
 }
@@ -32,8 +31,6 @@ void ADNM_GameStateBase::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("The LevelInfo array contains no entries in GameStateBase."));
 	}
-
-	CurrentEnemiesAlive = 0;
 	
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnTargetPoint::StaticClass(), EnemySpawnTargetPoints);
 	if (EnemySpawnTargetPoints.Num() == 0)
@@ -46,7 +43,6 @@ void ADNM_GameStateBase::BeginPlay()
 	{
 		PlayerControllerRef->OnGameRunningChanged.AddDynamic(this, &ADNM_GameStateBase::SetGameIsRunning);
 	}
-	
 }
 
 void ADNM_GameStateBase::Tick(float DeltaSeconds)
@@ -55,7 +51,13 @@ void ADNM_GameStateBase::Tick(float DeltaSeconds)
 
 	if (bGameIsRunning)
 	{
-		TryToSpawnNewEnemy(DeltaSeconds);
+		TimeSinceLastSpawn += DeltaSeconds;
+		if (TimeSinceLastSpawn >= LevelInfo[CurrentLevel].TimeBetweenSpawns)
+		{
+			TryToSpawnNewEnemy(DeltaSeconds);
+		}
+		const FString StringToDisplay = "Spawned: " + FString::FromInt(EnemiesSpawned) + ", Killed: " + FString::FromInt(EnemiesKilled) + ", Alive: " + FString::FromInt(SpawnedEnemies.Num()); 
+		GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Green, *StringToDisplay);
 	}
 }
 
@@ -64,10 +66,8 @@ void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
 	// Make sure there is information in the LevelInfo and EnemiesToSpawn arrays
 	if (LevelInfo.Num() > 0 && EnemiesToSpawn.Num() > 0)
 	{
-		TimeSinceLastSpawn += DeltaSeconds;
-
 		// Check if the time elapsed is greater than the time between spawning in the LevelInfo array and if the number of enemies alive for this level isn't exceeded 
-		if (TimeSinceLastSpawn >= LevelInfo[CurrentLevel].TimeBetweenSpawns && CurrentEnemiesAlive < LevelInfo[CurrentLevel].MaxEnemiesAlive)
+		if (SpawnedEnemies.Num() < LevelInfo[CurrentLevel].MaxEnemiesAlive)
 		{
 			// Check for valid entries in the spawn point array
 			if (EnemySpawnTargetPoints.Num() > 0)
@@ -78,7 +78,6 @@ void ADNM_GameStateBase::TryToSpawnNewEnemy(float DeltaSeconds)
 				{
 					LastSpawnPointUsed = RandomSpawnPoint;
 					TimeSinceLastSpawn = 0.f;
-					CurrentEnemiesAlive += 1;
 					SpawnNewEnemy(EnemySpawnTargetPoints[RandomSpawnPoint]);
 				}
 			}
@@ -93,7 +92,11 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const int32 RandomEnemyToSpawn = FMath::FRandRange(0, EnemiesToSpawn.Num() - 1);
-		GetWorld()->SpawnActor<ADNM_EnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters);
+		if (ADNM_EnemyCharacterBase* SpawnedEnemy = GetWorld()->SpawnActor<ADNM_EnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters))
+		{
+			SpawnedEnemies.Add(SpawnedEnemy);
+			EnemiesSpawned += 1;
+		}
 	}
 }
 
@@ -124,20 +127,30 @@ void ADNM_GameStateBase::SetGameIsRunning(const bool GameRunningIn)
 	}
 }
 
-void ADNM_GameStateBase::EnemyHasDied()
+void ADNM_GameStateBase::EnemyHasDied(ADNM_EnemyCharacterBase* EnemyThatDied)
 {
+	SpawnedEnemies.Remove(EnemyThatDied);
+
 	//  Randomly generate a chance to spawn an extra enemy
-	if (CurrentEnemiesAlive == LevelInfo[CurrentLevel].MaxEnemiesAlive)
+	if (SpawnedEnemies.Num() + 1 == LevelInfo[CurrentLevel].MaxEnemiesAlive && LevelInfo[CurrentLevel].bCanSpawnExtraEnemies)
 	{
 		const float RandomChance = FMath::FRandRange(0.f, 100.f);
 		// If the random chance is less than the spawn chance, remove an additional enemy count
 		if (RandomChance < LevelInfo[CurrentLevel].ChanceOfAdditionalEnemySpawn)
 		{
-			CurrentEnemiesAlive -= 1;
-			LevelInfo[CurrentLevel].MaxEnemiesAlive += 1;
+			if (EnemySpawnTargetPoints.Num() > 0)
+			{
+				const int32 RandomSpawnPoint = FMath::RandRange(1, EnemySpawnTargetPoints.Num()) - 1;
+				// Check the random number hasn't chosen the same as previous, to avoid enemies spawning on the same path too close together
+				if (RandomSpawnPoint != LastSpawnPointUsed)
+				{
+					LastSpawnPointUsed = RandomSpawnPoint;
+					TimeSinceLastSpawn = 0.f;
+					SpawnNewEnemy(EnemySpawnTargetPoints[RandomSpawnPoint]);
+				}
+			}
 		}
 	}
 
-	CurrentEnemiesAlive -= 1;	
-	
+	EnemiesKilled += 1;
 }

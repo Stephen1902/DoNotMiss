@@ -22,7 +22,7 @@ public:
 	void UpdateWidgetClock(const float NewTime);
 
 	void AlterPlayerBullet(int32 BulletNumber);
-	void EnemyHasDied();
+	void EnemyHasDied(class ADNM_EnemyCharacterBase* EnemyThatDied);
 
 	UFUNCTION(BlueprintCallable, Category = "Pause Menu")
 	void TogglePauseWidget();

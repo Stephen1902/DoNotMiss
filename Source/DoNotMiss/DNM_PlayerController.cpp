@@ -258,7 +258,7 @@ void ADNM_PlayerController::AlterPlayerBullet(const int32 BulletNumber)
 	}
 }
 
-void ADNM_PlayerController::EnemyHasDied()
+void ADNM_PlayerController::EnemyHasDied(ADNM_EnemyCharacterBase* EnemyThatDied)
 {
 	EnemiesKilled += 1;
 	if (PlayerWidgetRef)
@@ -268,7 +268,7 @@ void ADNM_PlayerController::EnemyHasDied()
 	
 	if (GameStateRef)
 	{
-		GameStateRef->EnemyHasDied();
+		GameStateRef->EnemyHasDied(EnemyThatDied);
 	}
 }
 

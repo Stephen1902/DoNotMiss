@@ -157,7 +157,7 @@ void ADNM_EnemyCharacterBase::EnemyHasDied()
 				
 		}
 		
-		PlayerControllerRef->EnemyHasDied();
+		PlayerControllerRef->EnemyHasDied(this);
 	}
 
 	// If the timer is running for this character to take some ammo, clear it before destroying

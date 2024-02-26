@@ -24,21 +24,25 @@ struct FLevelInfoStruct
 	// Maximum number of enemies to be spawned at any time
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
 	int32 MaxEnemiesAlive;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
-	float ChanceOfAdditionalEnemySpawn;
-
+	
 	// Time in seconds between enemy attempts to spawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
 	float TimeBetweenSpawns;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct")
+	bool bCanSpawnExtraEnemies;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Structs|Level Info Struct", meta=(EditCondition=bCanSpawnExtraEnemies))
+	float ChanceOfAdditionalEnemySpawn;
+	
 	FLevelInfoStruct()
 	{
 		Level = 1;
 		NumberOfEnemies = 10;
 		MaxEnemiesAlive = 4;
 		TimeBetweenSpawns = 1.0f;
-		ChanceOfAdditionalEnemySpawn = 25.f;
+		bCanSpawnExtraEnemies = false;
+		ChanceOfAdditionalEnemySpawn = 0.f;
 	}
 };
 
@@ -51,7 +55,7 @@ class DONOTMISS_API ADNM_GameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-	void EnemyHasDied();
+	void EnemyHasDied(class ADNM_EnemyCharacterBase* EnemyThatDied);
 
 	UPROPERTY()
 	FOnClockUpdated OnClockUpdated;
@@ -76,7 +80,6 @@ protected:
 private:
 	int32 CurrentLevel;
 	int32 EnemiesLeftToSpawn;
-	int32 CurrentEnemiesAlive;
 	int32 LastSpawnPointUsed;
 	float TimeSinceLastSpawn;
 
@@ -94,5 +97,13 @@ private:
 
 	UFUNCTION()
 	void SetGameIsRunning(const bool GameRunningIn);
+
+	UPROPERTY()
+	TArray<ADNM_EnemyCharacterBase*> SpawnedEnemies;
+	
+	// Testing only
+	int32 EnemiesSpawned = 0;
+	int32 EnemiesKilled = 0;
+	
 
 };
