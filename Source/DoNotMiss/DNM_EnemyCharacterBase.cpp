@@ -49,9 +49,7 @@ ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
 	DelayBeforeMoving = 0.2f;
 	AmmoTakenPerHit = 3;
 	DelayBetweenAmmoTake = 2.0f;
-	
-
-	
+		
 	static ConstructorHelpers::FClassFinder<ADNM_AIController> FoundAIController(TEXT("/Game/Blueprints/Enemies/BP_AIController"));
 	if (FoundAIController.Succeeded())
 	{
@@ -226,10 +224,27 @@ void ADNM_EnemyCharacterBase::SetCharacterParams()
 			else
 			{
 				GetMesh()->SetSkeletalMesh(HankNoClothesOptions[0]);
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(HankNoClothesOptions[1]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(HankNoClothesOptions[2]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(HankNoClothesOptions[3]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(HankNoClothesOptions[4]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					HairMesh->SetSkeletalMesh(HankNoClothesOptions[1]);
+					HairMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShirtMesh->SetSkeletalMesh(HankNoClothesOptions[2]);
+					ShirtMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					TrousersMesh->SetSkeletalMesh(HankNoClothesOptions[3]);
+					TrousersMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShoesMesh->SetSkeletalMesh(HankNoClothesOptions[4]);
+					ShoesMesh->SetForcedLOD(3);
+				}
+				
 			}
 			break;
 		// Options for Maria Character 
@@ -242,10 +257,26 @@ void ADNM_EnemyCharacterBase::SetCharacterParams()
 			else
 			{
 				GetMesh()->SetSkeletalMesh(MariaNoClothesOptions[0]);
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(MariaNoClothesOptions[1]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(MariaNoClothesOptions[2]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(MariaNoClothesOptions[3]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(MariaNoClothesOptions[4]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					HairMesh->SetSkeletalMesh(MariaNoClothesOptions[1]);
+					HairMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShirtMesh->SetSkeletalMesh(MariaNoClothesOptions[2]);
+					ShirtMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					TrousersMesh->SetSkeletalMesh(MariaNoClothesOptions[3]);
+					TrousersMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShoesMesh->SetSkeletalMesh(MariaNoClothesOptions[4]);
+					ShoesMesh->SetForcedLOD(3);
+				}
 		}
 			break;
 
@@ -259,11 +290,29 @@ void ADNM_EnemyCharacterBase::SetCharacterParams()
 			else
 			{
 				GetMesh()->SetSkeletalMesh(MikeNoClothesOptions[0]);
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { HairMesh->SetSkeletalMesh(MikeNoClothesOptions[1]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShirtMesh->SetSkeletalMesh(MikeNoClothesOptions[2]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { TrousersMesh->SetSkeletalMesh(MikeNoClothesOptions[3]); }
-				if (FMath::FRandRange(1.f, 100.f) < 50.f) { ShoesMesh->SetSkeletalMesh(MikeNoClothesOptions[4]); }
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					HairMesh->SetSkeletalMesh(MikeNoClothesOptions[1]);
+					HairMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShirtMesh->SetSkeletalMesh(MikeNoClothesOptions[2]);
+					ShirtMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					TrousersMesh->SetSkeletalMesh(MikeNoClothesOptions[3]);
+					TrousersMesh->SetForcedLOD(3);
+				}
+				if (FMath::FRandRange(1.f, 100.f) < 50.f)
+				{
+					ShoesMesh->SetSkeletalMesh(MikeNoClothesOptions[4]);
+					ShoesMesh->SetForcedLOD(3);
+				}
 			}
 			break;
 	}
+
+	GetMesh()->SetForcedLOD(3);
 }

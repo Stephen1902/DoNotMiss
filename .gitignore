@@ -6,13 +6,8 @@
 /.idea.PuzzlePlatforms.iml
 /contentModel.xml
 /modules.xml
-Content/Characters/
-Content/LevelPrototyping/
-Content/ThirdPerson/Input/
-Content/FirstPersonArms/
-Content/FPWeapon/
-Content/FPS_Weapon_Bundle/
-Content/YI_NPC/
+WindowsNoEditor/*
+/Plugins/Developer/RiderLink/*
 
 # Visual Studio 2015 user specific files
 .vs/
@@ -103,5 +98,10 @@ Content/RoboBars/*
 Content/Mannequin/*
 Content/ToolShedVOL1/*
 Content/Zombie/*
-/Plugins/Developer/RiderLink/*
-
+Content/Characters/
+Content/LevelPrototyping/
+Content/ThirdPerson/Input/
+Content/FirstPersonArms/
+Content/FPWeapon/
+Content/FPS_Weapon_Bundle/
+Content/YI_NPC/

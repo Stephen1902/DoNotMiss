@@ -56,8 +56,6 @@ void ADNM_GameStateBase::Tick(float DeltaSeconds)
 		{
 			TryToSpawnNewEnemy(DeltaSeconds);
 		}
-		const FString StringToDisplay = "Spawned: " + FString::FromInt(EnemiesSpawned) + ", Killed: " + FString::FromInt(EnemiesKilled) + ", Alive: " + FString::FromInt(SpawnedEnemies.Num()); 
-		GEngine->AddOnScreenDebugMessage(0, 0.f, FColor::Green, *StringToDisplay);
 	}
 }
 
@@ -95,7 +93,13 @@ void ADNM_GameStateBase::SpawnNewEnemy(const AActor* SpawnPointToUse)
 		if (ADNM_EnemyCharacterBase* SpawnedEnemy = GetWorld()->SpawnActor<ADNM_EnemyCharacterBase>(EnemiesToSpawn[RandomEnemyToSpawn], SpawnPointToUse->GetActorLocation(), SpawnPointToUse->GetActorRotation(), SpawnParameters))
 		{
 			SpawnedEnemies.Add(SpawnedEnemy);
-			EnemiesSpawned += 1;
+			EnemiesLeftToSpawn -= 1;
+			if (EnemiesLeftToSpawn <= 0 && CurrentLevel + 1 < LevelInfo.Num())
+			{
+				CurrentLevel += 1;
+				EnemiesLeftToSpawn = LevelInfo[CurrentLevel].NumberOfEnemies;
+				TimeSinceLastSpawn = LevelInfo[CurrentLevel].TimeBetweenSpawns;
+			}
 		}
 	}
 }
@@ -151,6 +155,6 @@ void ADNM_GameStateBase::EnemyHasDied(ADNM_EnemyCharacterBase* EnemyThatDied)
 			}
 		}
 	}
-
+	
 	EnemiesKilled += 1;
 }
