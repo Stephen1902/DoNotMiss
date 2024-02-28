@@ -21,7 +21,7 @@ protected:
 	void GetHighScoresFromGameBase();
 	
 	UFUNCTION(BlueprintImplementableEvent)
-	void DisplayHighScores(const float& TimeSurvived, const int32& EnemiesKilled);
+	void DisplayHighScores(const float& TimeSurvived, const int32& EnemiesKilled, const int32& AllTimeEnemies);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Mode")
 	ADoNotMissGameModeBase* GameModeRef;
@@ -29,4 +29,5 @@ protected:
 private:
 	float TimeSurvivedHighScore;
 	int32 EnemiesKilledHighScore;
+	int32 AllTimeEnemiesKilled;
 };

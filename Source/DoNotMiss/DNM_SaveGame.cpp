@@ -8,6 +8,7 @@ UDNM_SaveGame::UDNM_SaveGame()
 {
 	SavedTimeSurvived = 0.0f;
 	SavedEnemiesKilled = 0;
+	AllTimeEnemiesKilled = 0;
 }
 
 void UDNM_SaveGame::ResetSavedStats()
@@ -26,4 +27,14 @@ void UDNM_SaveGame::SetNewHighScores(float NewTimeSurvived, int32 NewEnemiesKill
 {
 	SavedTimeSurvived = NewTimeSurvived;
 	SavedEnemiesKilled= NewEnemiesKilled;
+}
+
+void UDNM_SaveGame::GetAllTimeHighScores(int32& EnemiesKilled) const
+{
+	EnemiesKilled = AllTimeEnemiesKilled;
+}
+
+void UDNM_SaveGame::SetNewAllTimeTotal(int32 TotalToAdd)
+{
+	AllTimeEnemiesKilled += TotalToAdd;
 }

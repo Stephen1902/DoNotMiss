@@ -58,48 +58,28 @@ ADNM_EnemyCharacterBase::ADNM_EnemyCharacterBase()
 	}
 }
 
-void ADNM_EnemyCharacterBase::DealWithProjectile(ADNM_ProjectileBase* ProjectileThatHit, const float DamageCaused)
+void ADNM_EnemyCharacterBase::DealWithProjectile(const float DamageCaused, const int32 DamageDivisor)
 {
-	if (ProjectileThatHit != nullptr)
+	if (DamageCaused > 0 && CurrentHealth > 0.f)
 	{
-		/*
-		// Check if the projectile already exists in the TMap
-		if (ProjectilesThatHit.Contains(ProjectileThatHit))
-		{
-			const float CurrentDamage = ProjectilesThatHit[ProjectileThatHit];
-			ProjectilesThatHit.Emplace(ProjectileThatHit, CurrentDamage + DamageCaused);
-			const float NewDamage = ProjectilesThatHit[ProjectileThatHit];
-			UE_LOG(LogTemp, Warning, TEXT("Damage Caused now: %s"), *FString::SanitizeFloat(NewDamage));
-		}
+		ProjectilesThatHit += (1.f / DamageDivisor);
+		CurrentHealth -= DamageCaused;
 		
-		else*/
+		if (CurrentHealth <= 0.f)
 		{
-			// Add the projectile that hit the enemy to the array
-			ProjectilesThatHit.Add(ProjectileThatHit); //, DamageCaused);
-		}
-		
-		//const float DamagedCaused = ProjectileThatHit->GetDamagePerBullet();
-		if (DamageCaused > 0)
-		{
-			CurrentHealth -= DamageCaused;
-			
-			if (CurrentHealth <= 0)
+			if (EnemyHealthWidgetComp)
 			{
-				if (EnemyHealthWidgetComp)
-				{
-					EnemyHealthWidgetComp->SetVisibility(false);
-				}
-				EnemyHasDied();
+				EnemyHealthWidgetComp->SetVisibility(false);
 			}
-			else
+			EnemyHasDied();
+		}
+		else
+		{
+			if (EnemyHealthWidgetComp)
 			{
-				if (EnemyHealthWidgetComp)
-				{
-					EnemyHealthWidgetComp->SetVisibility(true);
-					const float HealthToSend = 1.0f - ((StartingHealth - CurrentHealth) / StartingHealth);
-					OnHealthChanged(HealthToSend);
-					UE_LOG(LogTemp, Warning, TEXT("Health Percent is %s"), *FString::SanitizeFloat(HealthToSend));
-				}
+				EnemyHealthWidgetComp->SetVisibility(true);
+				const float HealthToSend = 1.0f - ((StartingHealth - CurrentHealth) / StartingHealth);
+				OnHealthChanged(HealthToSend);
 			}
 		}
 	}
@@ -148,13 +128,7 @@ void ADNM_EnemyCharacterBase::EnemyHasDied()
 	// Get the player character
 	if (PlayerControllerRef)
 	{
-		PlayerControllerRef->AlterPlayerBullet(ProjectilesThatHit.Num());
-		// TODO Change this so it returns the actual type of bullet, not just a number of bullets for gun switching later
-		for (int32 i = 0; i < ProjectilesThatHit.Num(); ++i)
-		{
-				
-		}
-		
+		PlayerControllerRef->AlterPlayerBullet(ProjectilesThatHit);
 		PlayerControllerRef->EnemyHasDied(this);
 	}
 

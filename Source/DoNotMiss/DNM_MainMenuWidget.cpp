@@ -21,6 +21,6 @@ void UDNM_MainMenuWidget::GetHighScoresFromGameBase()
 		GameModeRef = Cast<ADoNotMissGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	}
 
-	GameModeRef->GetHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore);
-	DisplayHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore);
+	GameModeRef->GetHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore, AllTimeEnemiesKilled);
+	DisplayHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore, AllTimeEnemiesKilled);
 }

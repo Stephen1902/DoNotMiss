@@ -26,6 +26,8 @@ ADNM_PlayerController::ADNM_PlayerController()
 	SavedTimeSurvived = 0.0f;
 	SavedEnemiesKilled = 0;
 	SaveGameSlot = "Slot0";
+	AllTimedEnemiesKilled = 0;
+	AllTimeGameSlot = "Slot1";
 }
 
 void ADNM_PlayerController::GameHasStarted()
@@ -255,12 +257,48 @@ void ADNM_PlayerController::AlterPlayerBullet(const int32 BulletNumber)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to get UDNM_SaveGame in Player Controller"));
 		}
+
+		// Check if a saved game already exists and if not, create it
+		if (UGameplayStatics::DoesSaveGameExist(AllTimeGameSlot, 1))
+		{
+			AllTimeGameRef = UGameplayStatics::LoadGameFromSlot(AllTimeGameSlot, 1);
+		}
+		else
+		{
+			AllTimeGameRef = Cast<UDNM_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDNM_SaveGame::StaticClass()));
+		}
+
+		// Cast to the specific instance of the SaveGame class for the HighScore variable
+		ThisAllTimeGameRef = Cast<UDNM_SaveGame>(AllTimeGameRef);
+	
+		if (ThisAllTimeGameRef)
+		{
+			ThisAllTimeGameRef->GetAllTimeHighScores(AllTimedEnemiesKilled);
+
+			AllTimedEnemiesKilled += EnemiesKilled;
+			ThisAllTimeGameRef->SetNewAllTimeTotal(AllTimedEnemiesKilled);
+			
+			if (UGameplayStatics::SaveGameToSlot(ThisAllTimeGameRef, AllTimeGameSlot, 1))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("All Time Game Saved"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Game failed to save"));
+			}
+					}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to save all time scores in Player Controller"));
+		}
 	}
 }
 
 void ADNM_PlayerController::EnemyHasDied(ADNM_EnemyCharacterBase* EnemyThatDied)
 {
 	EnemiesKilled += 1;
+
+	
 	if (PlayerWidgetRef)
 	{
 		PlayerWidgetRef->UpdateEnemyKilledCount(FText::FromString(FString::FromInt(EnemiesKilled)));

@@ -23,10 +23,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Saved Game Options")
 	int32 SavedEnemiesKilled;
 
+	UPROPERTY(EditAnywhere, Category = "Saved Game Options")
+	int32 AllTimeEnemiesKilled;
 public:
 	void ResetSavedStats();
 
 	void GetHighScores(float& TimeSurvived, int32& EnemiesKilled);
 
 	void SetNewHighScores(float NewTimeSurvived, int32 NewEnemiesKilled);
+
+	void GetAllTimeHighScores(int32& EnemiesKilled) const;
+	void SetNewAllTimeTotal(int32 TotalToAdd);
 };

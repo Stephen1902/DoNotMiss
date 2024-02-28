@@ -105,4 +105,16 @@ private:
 	float SavedTimeSurvived;
 	int32 SavedEnemiesKilled;
 
+	UPROPERTY()
+	USaveGame* AllTimeGameRef;
+	
+	UPROPERTY()
+	UDNM_SaveGame* ThisAllTimeGameRef;
+	
+	FString AllTimeGameSlot;
+	float AllTimedTimeSurvived;
+	int32 AllTimedEnemiesKilled;
+
+	
+
 };

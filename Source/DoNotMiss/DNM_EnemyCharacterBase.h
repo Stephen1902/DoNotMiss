@@ -16,7 +16,7 @@ public:
 	ADNM_EnemyCharacterBase();
 
 	// Called when a projectile hits this enemy
-	void DealWithProjectile(class ADNM_ProjectileBase* ProjectileThatHit, float DamageCaused);
+	void DealWithProjectile(const float DamageCaused, const int32 DamageDivisor);
 
 protected:
 	// Called when the game starts or when spawned
@@ -86,11 +86,11 @@ public:
 
 	float CurrentHealth;
 	void EnemyHasDied();
-	
+/*	
 	UPROPERTY()
-	TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
-	//TMap<ADNM_ProjectileBase*, float> ProjectilesThatHit;
-
+	//TArray<ADNM_ProjectileBase*> ProjectilesThatHit;
+	TMap<ADNM_ProjectileBase*, float> ProjectilesThatHit;
+*/
 private:
 	FTimerHandle TakeAmmoTimer;
 	void TakeEnemyAmmo();
@@ -108,5 +108,7 @@ private:
 	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	void SetCharacterParams();
+
+	float ProjectilesThatHit = 0.f;
 };
 

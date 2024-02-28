@@ -12,14 +12,19 @@ ADoNotMissGameModeBase::ADoNotMissGameModeBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	SaveGameSlot = "Slot0";
+	HighScoreSaveSlot = "Slot0";
+	AllTimeSaveSlot = "Slot1";
+	TimeSurvivedHighScore = 0.f;
+	EnemiesKilledHighScore = 0;
+	TotalEnemiesKilled = 0;
 }
 
 
-void ADoNotMissGameModeBase::GetHighScores(float& TimeSurvived, int32& EnemiesKilled) const
+void ADoNotMissGameModeBase::GetHighScores(float& TimeSurvived, int32& EnemiesKilled, int32& AllTimeEnemiesKilled) const
 {
 	TimeSurvived = TimeSurvivedHighScore;
 	EnemiesKilled = EnemiesKilledHighScore;
+	AllTimeEnemiesKilled = TotalEnemiesKilled;
 }
 
 bool ADoNotMissGameModeBase::ResetHighScores()
@@ -28,7 +33,7 @@ bool ADoNotMissGameModeBase::ResetHighScores()
 	{
 		ThisSaveGameRef->SetNewHighScores(0.0f, 0);
 
-		if (UGameplayStatics::SaveGameToSlot(ThisSaveGameRef, SaveGameSlot, 0))
+		if (UGameplayStatics::SaveGameToSlot(ThisSaveGameRef, HighScoreSaveSlot, 0))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Successfully Reset Scores"));
 			TimeSurvivedHighScore = 0.0f;
@@ -52,26 +57,42 @@ void ADoNotMissGameModeBase::BeginPlay()
 void ADoNotMissGameModeBase::SetSaveGameRef()
 {
 	// Check if a saved game already exists and if not, create it
-	if (UGameplayStatics::DoesSaveGameExist(SaveGameSlot, 0))
+	if (UGameplayStatics::DoesSaveGameExist(HighScoreSaveSlot, 0))
 	{
-		SaveGameRef = UGameplayStatics::LoadGameFromSlot(SaveGameSlot, 0);
+		HighScoreSaveRef = UGameplayStatics::LoadGameFromSlot(HighScoreSaveSlot, 0);
 	}
 	else
 	{
-		SaveGameRef = Cast<UDNM_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDNM_SaveGame::StaticClass()));
+		HighScoreSaveRef = Cast<UDNM_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDNM_SaveGame::StaticClass()));
 	}
 
 	// Cast to the specific instance of the SaveGame class for the HighScore variables
-	ThisSaveGameRef = Cast<UDNM_SaveGame>(SaveGameRef);
+	ThisSaveGameRef = Cast<UDNM_SaveGame>(HighScoreSaveRef);
 	
 	if (ThisSaveGameRef)
 	{
 		ThisSaveGameRef->GetHighScores(TimeSurvivedHighScore , EnemiesKilledHighScore);
-		UE_LOG(LogTemp, Warning, TEXT("TimeSurvivedHighScore is %s, EnemiesKilledHighScore is %i"), *FString::SanitizeFloat(TimeSurvivedHighScore), EnemiesKilledHighScore);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to get a Saved Game Reference in DoNotMissGameModeBase"));
+	}
+
+	if (UGameplayStatics::DoesSaveGameExist(AllTimeSaveSlot, 1))
+	{
+		AllTimeSaveRef = UGameplayStatics::LoadGameFromSlot(AllTimeSaveSlot, 1);
+	}
+	else
+	{
+		AllTimeSaveRef = Cast<UDNM_SaveGame>(UGameplayStatics::CreateSaveGameObject(UDNM_SaveGame::StaticClass()));
+	}
+
+	ThisAllTimeSaveRef = Cast<UDNM_SaveGame>(AllTimeSaveRef);
+
+	if (ThisAllTimeSaveRef)
+	{
+		ThisAllTimeSaveRef->GetAllTimeHighScores(TotalEnemiesKilled);
+		UE_LOG(LogTemp, Warning, TEXT("TotalEnemiesKilled set to: %i"), TotalEnemiesKilled);
 	}
 }
 

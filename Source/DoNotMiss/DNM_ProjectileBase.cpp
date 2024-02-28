@@ -55,7 +55,7 @@ void ADNM_ProjectileBase::ComponentBeginOverlap(UPrimitiveComponent* OverlappedC
 {
 	if (ADNM_EnemyCharacterBase* EnemyHit = Cast<ADNM_EnemyCharacterBase>(OtherActor))
 	{
-		EnemyHit->DealWithProjectile(this, DamagePerBullet / DamageDivision);
+		EnemyHit->DealWithProjectile(DamagePerBullet / DamageDivision, DamageDivision);
 		GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &ADNM_ProjectileBase::DestroyAfterDelay, 0.03333f, false);
 	}
 	
