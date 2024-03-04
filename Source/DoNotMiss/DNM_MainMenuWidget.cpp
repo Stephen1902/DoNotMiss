@@ -2,7 +2,6 @@
 
 
 #include "DNM_MainMenuWidget.h"
-
 #include "DoNotMissGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -23,4 +22,15 @@ void UDNM_MainMenuWidget::GetHighScoresFromGameBase()
 
 	GameModeRef->GetHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore, AllTimeEnemiesKilled);
 	DisplayHighScores(TimeSurvivedHighScore, EnemiesKilledHighScore, AllTimeEnemiesKilled);
+}
+
+void UDNM_MainMenuWidget::GetGameSettingsFromGameBase()
+{
+	if (!GameModeRef)
+	{
+		GameModeRef = Cast<ADoNotMissGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	}
+
+	GameModeRef->GetUserSettings(bPlayMenuMusic, MenuMusicVol, bPlayInGameSounds, InGameSoundVol);
+	SendInGameSettings(bPlayMenuMusic, MenuMusicVol, bPlayInGameSounds, InGameSoundVol);
 }

@@ -286,7 +286,7 @@ void ADNM_PlayerController::AlterPlayerBullet(const int32 BulletNumber)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Game failed to save"));
 			}
-					}
+		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to save all time scores in Player Controller"));

@@ -23,11 +23,24 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void DisplayHighScores(const float& TimeSurvived, const int32& EnemiesKilled, const int32& AllTimeEnemies);
 
+	UFUNCTION(BlueprintCallable, Category = "About Tab")
+	void GetGameSettingsFromGameBase();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SendInGameSettings (const bool PlayMenuMusic, const float& MenuMusicVolume, const bool PlayInGameSounds, const float& InGameSoundVolume);
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Mode")
 	ADoNotMissGameModeBase* GameModeRef;
 
 private:
+	// High score variables
 	float TimeSurvivedHighScore;
 	int32 EnemiesKilledHighScore;
 	int32 AllTimeEnemiesKilled;
+
+	// Game setting variables
+	bool bPlayMenuMusic;
+	float MenuMusicVol;
+	bool bPlayInGameSounds;
+	float InGameSoundVol;
 };

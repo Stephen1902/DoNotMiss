@@ -6,9 +6,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "DNM_SaveGame.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 
 /* Sets default variables */
-ADoNotMissGameModeBase::ADoNotMissGameModeBase()
+ADoNotMissGameModeBase::ADoNotMissGameModeBase() 
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -17,6 +19,16 @@ ADoNotMissGameModeBase::ADoNotMissGameModeBase()
 	TimeSurvivedHighScore = 0.f;
 	EnemiesKilledHighScore = 0;
 	TotalEnemiesKilled = 0;
+	HighScoreSaveRef = nullptr;
+	ThisSaveGameRef = nullptr;
+	AllTimeSaveRef = nullptr;
+	ThisAllTimeSaveRef = nullptr;
+	MainMenuRef = nullptr;
+
+	bPlayMenuMusic = true;
+	MenuMusicVolume = 1.f;
+	bPlayInGameSounds = true;
+	InGameSoundVolume = 1.f;
 }
 
 
@@ -25,6 +37,14 @@ void ADoNotMissGameModeBase::GetHighScores(float& TimeSurvived, int32& EnemiesKi
 	TimeSurvived = TimeSurvivedHighScore;
 	EnemiesKilled = EnemiesKilledHighScore;
 	AllTimeEnemiesKilled = TotalEnemiesKilled;
+}
+
+void ADoNotMissGameModeBase::GetUserSettings(bool& PlayMenuMusicOUT, float& MenuMusicVolumeOUT, bool& PlayInGameSoundsOUT, float& InGameSoundVolumeOUT) const
+{
+	PlayMenuMusicOUT = bPlayMenuMusic;
+	MenuMusicVolumeOUT = MenuMusicVolume;
+	PlayInGameSoundsOUT = bPlayInGameSounds;
+	InGameSoundVolumeOUT = InGameSoundVolume;
 }
 
 bool ADoNotMissGameModeBase::ResetHighScores()
@@ -45,6 +65,31 @@ bool ADoNotMissGameModeBase::ResetHighScores()
 	return false;
 }
 
+bool ADoNotMissGameModeBase::SaveSettings()
+{
+	if (ThisAllTimeSaveRef)
+	{
+		ThisAllTimeSaveRef->SetInGameSettings(bPlayMenuMusic, MenuMusicVolume, bPlayInGameSounds, InGameSoundVolume);
+		return true;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Failed to save settings on exit"));
+	return false;
+}
+
+void ADoNotMissGameModeBase::MenuMusicStateChanged(bool NewMusicStateIn)
+{
+	bPlayMenuMusic = NewMusicStateIn;
+
+	if (bPlayMenuMusic && AudioComponent)
+	{
+		PlayMenuMusic();
+	}
+	else
+	{
+		AudioComponent->Stop();
+	}
+}
+
 
 void ADoNotMissGameModeBase::BeginPlay()
 {
@@ -52,6 +97,7 @@ void ADoNotMissGameModeBase::BeginPlay()
 
 	SetSaveGameRef();
 	CreateMainMenuWidget();
+	PlayMenuMusic();
 }
 
 void ADoNotMissGameModeBase::SetSaveGameRef()
@@ -92,7 +138,11 @@ void ADoNotMissGameModeBase::SetSaveGameRef()
 	if (ThisAllTimeSaveRef)
 	{
 		ThisAllTimeSaveRef->GetAllTimeHighScores(TotalEnemiesKilled);
-		UE_LOG(LogTemp, Warning, TEXT("TotalEnemiesKilled set to: %i"), TotalEnemiesKilled);
+		ThisAllTimeSaveRef->GetInGameSettings(bPlayMenuMusic, MenuMusicVolume, bPlayInGameSounds, InGameSoundVolume);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load all time save ref"));
 	}
 }
 
@@ -108,4 +158,43 @@ void ADoNotMissGameModeBase::CreateMainMenuWidget()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("MainMenuWidget is not set in DoNotMissGameModeBase"));
 	}
+}
+
+void ADoNotMissGameModeBase::PlayMenuMusic()
+{
+	if (bPlayMenuMusic && MainMenuMusic)
+	{
+		AudioComponent = UGameplayStatics::SpawnSound2D(GetWorld(), MainMenuMusic, MenuMusicVolume);
+		AudioComponent->Play(0.f);
+	}
+}
+
+void ADoNotMissGameModeBase::AdjustMenuMusicVolume(const float VolumeLevelIn)
+{
+	if (AudioComponent)
+	{
+		MenuMusicVolume = VolumeLevelIn;
+		if (VolumeLevelIn > 0.f)
+		{
+			AudioComponent->SetVolumeMultiplier(VolumeLevelIn);
+			if (!AudioComponent->IsPlaying())
+			{
+				AudioComponent->Play(0.f);
+			}
+		}
+		else
+		{
+			AudioComponent->Stop();
+		}
+	}
+}
+
+void ADoNotMissGameModeBase::InGameSoundStateChanged(bool NewSoundStateIn)
+{
+	bPlayInGameSounds = NewSoundStateIn;
+}
+
+void ADoNotMissGameModeBase::AdjustInGameSoundVolume(const float VolumeLevelIn)
+{
+	InGameSoundVolume = VolumeLevelIn;
 }
